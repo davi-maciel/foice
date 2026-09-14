@@ -65,6 +65,7 @@
           <option value="recentes">Mais recentes primeiro</option>
           <option value="antigos">Mais antigos primeiro</option>
           <option value="dificuldade">Por dificuldade</option>
+          <option value="repetidos">Mais repetidos</option>
           <option value="aleatorio">Ordem aleatória</option>
           <option value="relevancia" hidden>Relevância</option>
         </select></span>
@@ -99,6 +100,7 @@
       <div>
         <h4>Como funciona</h4>
         <p>Os enunciados, títulos e temas são extraídos automaticamente dos PDFs (<code>scripts/build_index.py</code>). Pode haver erros: um tema trocado ou um título cortado. Correções são bem-vindas.</p>
+        <p>“Problemas parecidos” compara os enunciados palavra a palavra: muitos problemas reaparecem anos depois, com outro título. Listas em inglês não batem com as em português.</p>
         <p>“Resolvido” fica salvo só neste navegador.</p>
       </div>
       <div>
@@ -129,6 +131,7 @@
       <span id="posInfo" style="margin-left:auto;color:var(--ink-3);font-size:13px"></span>
     </div>
     <div class="statement"></div>
+    <section class="similar" id="similar" aria-label="Problemas parecidos" hidden></section>
     <div class="viewer"><iframe title="PDF da lista" src="about:blank"></iframe><div class="hint">O visualizador abre na página do problema. Se o seu navegador não pular para ela, use “Abrir PDF”.</div></div>
   </aside>
   <div class="toast" id="toast" role="status"></div>

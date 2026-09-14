@@ -1,0 +1,12 @@
+{
+  "_comment": "Pares que o cálculo de 'problemas parecidos' pontua alto mas que NÃO são o mesmo problema, conferidos à mão. Quase todos já ficam abaixo do limiar; estão aqui para não voltarem se os limiares de scripts/build_index.py forem afrouxados. Formato: {\"exclude\": [[id, id], ...]}.",
+  "exclude": [
+    ["2020-vinicius-1-8", "2020-vinicius-2-8"],
+    ["2020-vinicius-1-9", "2020-vinicius-2-9"],
+    ["2019-timbo-2-5", "2019-timbo-2-6"],
+    ["2019-bastos-1-18", "2019-bastos-3-10"],
+    ["2019-bastos-3-10", "2021-italo-3-5"],
+    ["2024-baptista-1-8", "2024-baptista-1-10"],
+    ["2020-maciel-1parte1-10", "2021-ponciano-1-4"]
+  ]
+}

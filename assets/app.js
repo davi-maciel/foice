@@ -25,6 +25,11 @@
     p.idx = i;
     l.topics[p.topic] = (l.topics[p.topic] || 0) + 1;
   });
+  const byId = Object.fromEntries(D.problems.map((p) => [p.id, p]));
+  const groupSize = {};
+  D.problems.forEach((p) => { if (p.group) groupSize[p.group] = (groupSize[p.group] || 0) + 1; });
+  D.problems.forEach((p) => { p.similar = p.similar || []; p.versions = p.group ? groupSize[p.group] : 1; });
+  const simLabel = (score) => (score >= 0.75 ? "praticamente igual" : "mesma ideia");
   const authorsSorted = Object.entries(D.authors).map(([id, name]) => ({ id, name, n: D.problems.filter((p) => p.authorId === id).length }))
     .sort((a, b) => a.name.localeCompare(b.name, "pt"));
   const years = [...new Set(D.lists.map((l) => l.year))].sort((a, b) => b - a);
@@ -59,7 +64,7 @@
     for (const [k, hk] of Object.entries(HASH_KEYS)) if (sp.has(hk)) state[k] = sp.get(hk);
     state.hideSolved = sp.get("hs") === "1";
     if (!["problemas", "listas"].includes(state.view)) state.view = "problemas";
-    if (!["recentes", "antigos", "dificuldade", "aleatorio", "relevancia"].includes(state.sort)) state.sort = "recentes";
+    if (!["recentes", "antigos", "dificuldade", "repetidos", "aleatorio", "relevancia"].includes(state.sort)) state.sort = "recentes";
   }
   function writeHash() {
     const sp = new URLSearchParams();
@@ -109,6 +114,7 @@
     else if (sort === "recentes") arr.sort((a, b) => b.year - a.year || byList(a, b));
     else if (sort === "antigos") arr.sort((a, b) => a.year - b.year || byList(a, b));
     else if (sort === "dificuldade") arr.sort((a, b) => (a.stars || 9) - (b.stars || 9) || b.year - a.year || byList(a, b));
+    else if (sort === "repetidos") arr.sort((a, b) => b.versions - a.versions || b.year - a.year || byList(a, b));
     else if (sort === "aleatorio") arr.sort((a, b) => rng(a.idx) - rng(b.idx));
     return arr;
   }
@@ -139,13 +145,14 @@
     return "…" + t.slice(start + 1, start + 220);
   }
   const starsHtml = (p) => p.stars ? `<span class="stars" title="dificuldade indicada pelo autor">${STAR.repeat(p.stars)}</span>` : "";
+  const versionsHtml = (p) => p.versions > 1 ? `<span class="versions" title="este problema aparece em ${p.versions} listas">${p.versions} versões</span>` : "";
   const pdfHref = (p, page) => `${p.L.file}#page=${page || p.page}`;
   function cardHtml(p, toks) {
     const title = p.title ? highlight(p.title, toks) : `<span class="num">Problema ${esc(p.label)}</span>`;
     const probNo = p.title ? ` · problema ${esc(p.label)}` : "";
     const src = p.source ? ` · <span title="fonte citada na lista">${esc(p.source)}</span>` : "";
     return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
-      <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${starsHtml(p)}</div>
+      <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}</div>
       <h3 class="title">${title}</h3>
       <div class="meta"><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year} · p.&nbsp;${p.page}${src}</div>
       <p class="snippet">${highlight(snippet(p, toks), toks)}</p>
@@ -232,7 +239,7 @@
     if (prev) $$(`[data-id="${prev}"]`).forEach((el) => el.classList.remove("active"));
     $$(`[data-id="${id}"]`).forEach((el) => el.classList.add("active"));
     const i = current.findIndex((x) => x.id === id);
-    $(".ptags", els.panel).innerHTML = `<span>${esc(topicLabel[p.topic])}</span>${starsHtml(p)}`;
+    $(".ptags", els.panel).innerHTML = `<span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}`;
     $("h2", els.panel).textContent = p.displayTitle;
     $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages}${p.source ? ` · fonte: ${esc(p.source)}` : ""}`;
     $(".statement", els.panel).innerHTML = `<p>${esc(p.text || "(sem texto extraído — veja o PDF)")}${p.text && p.text.length >= 900 ? "…" : ""}</p><small>Texto extraído automaticamente do PDF; fórmulas e figuras só aparecem direito no PDF.</small>`;
@@ -243,10 +250,22 @@
     $("#prevBtn", els.panel).disabled = i <= 0; $("#nextBtn", els.panel).disabled = i === -1 || i >= current.length - 1;
     $("#posInfo", els.panel).textContent = i === -1 ? "" : `${i + 1} / ${current.length}`;
     renderPanelSolved();
+    renderSimilar(p);
     const frame = $("iframe", els.panel);
     if (isDesktop()) { const src = `${p.L.file}#page=${p.page}&navpanes=0&view=FitH`; if (frame.getAttribute("src") !== src) frame.setAttribute("src", src); }
     els.panel.setAttribute("open", ""); els.scrim.setAttribute("open", ""); document.body.classList.add("panel-open");
     if (scroll) { const card = $(`.card[data-id="${id}"]`); if (card) card.scrollIntoView({ block: "center", behavior: "smooth" }); }
+  }
+  function renderSimilar(p) {
+    const near = (p.similar || []).map((s) => ({ q: byId[s.id], score: s.score })).filter((x) => x.q);
+    els.similar.hidden = !near.length;
+    if (!near.length) { els.similar.innerHTML = ""; return; }
+    els.similar.innerHTML = `<h3>Problemas parecidos <b>${near.length}</b></h3>
+      <ul>${near.map(({ q, score }) => `<li><button class="simrow" data-open="${esc(q.id)}" title="Abrir este problema">
+        <span class="simtitle">${esc(q.displayTitle)}</span>
+        <span class="simmeta">${esc(q.authorName)} · ${esc(q.L.label)} · ${q.year}${q.title ? ` · problema ${esc(q.label)}` : ""}</span>
+        <span class="simtag">${simLabel(score)}</span></button></li>`).join("")}</ul>
+      <small>Comparação automática dos enunciados: o mesmo problema costuma voltar em outro ano, às vezes com outro título.</small>`;
   }
   function renderPanelSolved() {
     const b = $("#panelSolve", els.panel); const on = isSolved(state.open);
@@ -274,7 +293,7 @@
 
   // ------------------------------------------------------------------ wire up
   function init() {
-    Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q") });
+    Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q"), similar: $("#similar") });
     readHash();
     els.q.value = state.q; $(".search").classList.toggle("has-q", !!state.q);
     $("#statTotal").textContent = D.problems.length; $("#statLists").textContent = D.lists.length; $("#statAuthors").textContent = Object.keys(D.authors).length;
@@ -307,6 +326,7 @@
     els.years.addEventListener("click", (e) => { const b = e.target.closest("button[data-list]"); if (!b) return; const l = lists[b.dataset.list]; Object.assign(state, { view: "problemas", list: l.id, author: "", year: "", topic: "", q: "", shown: 72 }); els.q.value = ""; render(); window.scrollTo({ top: 0 }); });
     $("#closeBtn").addEventListener("click", closeDetail); els.scrim.addEventListener("click", closeDetail);
     $("#prevBtn").addEventListener("click", () => nav(-1)); $("#nextBtn").addEventListener("click", () => nav(1));
+    els.similar.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(b.dataset.open, { scroll: true }); });
     $("#panelSolve").addEventListener("click", () => toggleSolved(state.open));
     $("#panelRandom").addEventListener("click", random);
     document.addEventListener("keydown", (e) => {
