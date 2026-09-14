@@ -2,15 +2,17 @@
 """Build data/problems.js from the PDFs in listas/ and the catalog in data/catalog.json.
 
 Usage:  python3 scripts/build_index.py            (needs: pip install pdfminer.six)
-        python3 scripts/build_index.py --debug     (prints every list and problem found)
+        python3 scripts/build_index.py --debug     (prints every list and problem found,
+                                                    plus the near-duplicate report)
 
 To add a list: put the PDF under listas/<ano>/<Autor>/, add an entry to data/catalog.json
 (optionally with "hint": "<topic id>" when the whole list is about one topic), run this
 script and commit data/problems.js together with the PDF. Manual corrections go in
 data/overrides.json, keyed by problem id: {"2019-timbo-1-4": {"topic": "termo", "title": "..."}}.
+Near-duplicate corrections go in data/similar_overrides.json (see "near-duplicates" below).
 """
-import json, os, re, sys, unicodedata, datetime
-from collections import Counter
+import json, math, os, re, sys, unicodedata, datetime
+from collections import Counter, defaultdict
 sys.path.insert(0, os.path.dirname(__file__))
 from pdftext import extract
 
@@ -306,6 +308,169 @@ def normalize(sc):
     tot = sum(sc.values())
     return {k: (v / tot if tot else 0.0) for k, v in sc.items()}
 
+# ----------------------------------------------------------------------------- near-duplicates
+# Many problems come back in a later year: same statement with a new title, a reworded
+# statement, or the same problem with extra sub-items. Two scores decide whether a pair is
+# the same problem, both computed on "title + text" reduced to content words:
+#   cos   cosine over TF-IDF of word unigrams + bigrams — catches rewordings;
+#   cont  containment = shared word 3-grams / 3-grams of the SHORTER text — catches a
+#         version that kept the original statement and added items to it.
+# A pair is accepted when cos >= SIM_COS, or when cont >= SIM_CONT and the cosine is at
+# least SIM_CONT_COS (containment alone drifts on short statements). Thresholds were tuned
+# by reading the `--debug` report; see README.md ("Problemas parecidos") before moving them.
+# Character 5-grams were tried instead of word 3-grams and scored *worse*: pairs such as
+# "esfera uniformemente polarizada / magnetizada" are different problems written in almost
+# the same words, and character n-grams cannot tell them apart.
+SIM_MIN_TOKENS = 8    # statements shorter than this are too generic to compare at all
+SIM_COS = 0.41        # cosine above which a pair is the same problem
+SIM_CONT = 0.45       # containment above which a pair is the same problem ...
+SIM_CONT_COS = 0.30   # ... provided the cosine is at least this
+SIM_SAME_LIST = 0.75  # two problems of the same list need this much (lists repeat themes)
+SIM_MAX = 8           # most similar problems kept per problem
+SIM_BIG_GROUP = 6     # components bigger than this are flagged in the --debug report
+SIM_REPORT = 0.28     # candidates printed in the report, accepted or not
+
+SIM_STOP = set("""
+a o as os um uma uns umas de do da dos das em no na nos nas por pelo pela pelos pelas para com sem
+sob sobre entre ate apos ante contra desde perante e ou mas que se como quando onde qual quais quanto
+quanta quantos quantas cujo cuja cujos cujas ao aos ha eh ser sao foi era eram sendo esta estao estava
+seja sejam tem tinha ter teve havia haja pode podem possa poderia deve devem devera devemos sua seu
+suas seus dele dela deles delas este esta estes estas esse essa esses essas aquele aquela aqueles
+aquelas isso isto aquilo mesmo mesma mesmos mesmas outro outra outros outras todo toda todos todas
+cada qualquer algum alguma alguns algumas nenhum nenhuma muito muita muitos muitas pouco pouca poucos
+poucas mais menos tao tanto tambem ja nao sim so somente apenas entao assim ainda depois antes agora
+sempre nunca aqui ali la lhe me te nos vos eles elas voce eu tu ele ela seguinte seguintes
+respectivamente caso casos valor valores forma modo maneira termos funcao dada dado dados dadas
+determine calcule mostre encontre obtenha considere suponha assuma expresse estime prove demonstre
+explique descreva indique verifique deduza derive ache faca sabendo dica obs nota figura fig figuras
+tabela problema questao exercicio item itens letra parte partes resposta respostas ponto pontos
+the of and in on to an is are be was were that this these those with for from by at as it its if
+when where which what how show find determine calculate consider assume suppose let given prove
+express obtain compute derive explain describe hint note figure table problem question item answer
+part parts point points can may must should will would there their they them you your we our
+""".split())
+
+def sim_tokens(text):
+    """'title + text' -> content words: no accents, digits, punctuation, LaTeX residue or stopwords."""
+    t = strip_accents(text.lower())
+    t = re.sub(r"\\[a-z]+", " ", t)      # LaTeX commands left in the extracted text
+    t = re.sub(r"[^a-z]+", " ", t)       # digits, punctuation, greek letters, symbols
+    return [w for w in t.split() if len(w) > 1 and w not in SIM_STOP]
+
+def sim_terms(toks):
+    return toks + [toks[i] + " " + toks[i + 1] for i in range(len(toks) - 1)]
+
+def sim_vectors(docs):
+    """TF-IDF vectors (dicts term -> weight), L2-normalised."""
+    n = len(docs)
+    df = Counter()
+    for terms in docs:
+        df.update(set(terms))
+    vecs = []
+    for terms in docs:
+        tf = Counter(terms)
+        v = {t: (1 + math.log(c)) * (math.log((n + 1) / (df[t] + 1)) + 1.0) for t, c in tf.items()}
+        norm_ = math.sqrt(sum(x * x for x in v.values())) or 1.0
+        vecs.append({t: x / norm_ for t, x in v.items()})
+    return vecs, df
+
+def sim_shingles(toks, k=3):
+    if len(toks) < k:
+        return {" ".join(toks)} if toks else set()
+    return {" ".join(toks[i:i + k]) for i in range(len(toks) - k + 1)}
+
+def sim_pairs(problems, excluded):
+    """Score every candidate pair. Returns [(i, j, cos, cont, ok, why)] sorted by score."""
+    toks = [sim_tokens((p["title"] or "") + " . " + (p["text"] or "")) for p in problems]
+    vecs, df = sim_vectors([sim_terms(t) for t in toks])
+    shs = [sim_shingles(t) for t in toks]
+    n = len(problems)
+    # candidate generation: two problems must share a reasonably rare term to be worth scoring
+    inv = defaultdict(list)
+    for i, v in enumerate(vecs):
+        if len(toks[i]) < SIM_MIN_TOKENS:
+            continue
+        for t in v:
+            if df[t] <= max(3, n // 4):
+                inv[t].append(i)
+    cand = set()
+    for docs in inv.values():
+        for a in range(len(docs)):
+            for b in range(a + 1, len(docs)):
+                cand.add((docs[a], docs[b]))
+    out = []
+    for i, j in cand:
+        va, vb = (vecs[i], vecs[j]) if len(vecs[i]) <= len(vecs[j]) else (vecs[j], vecs[i])
+        cos = sum(w * vb.get(t, 0.0) for t, w in va.items())
+        inter = len(shs[i] & shs[j])
+        cont = inter / min(len(shs[i]), len(shs[j])) if shs[i] and shs[j] else 0.0
+        score = max(cos, cont)
+        if score < SIM_REPORT:
+            continue
+        pid = tuple(sorted((problems[i]["id"], problems[j]["id"])))
+        ok, why = True, ""
+        if pid in excluded:
+            ok, why = False, "na lista de exclusões"
+        elif cos < SIM_COS and not (cont >= SIM_CONT and cos >= SIM_CONT_COS):
+            ok, why = False, "abaixo do limiar"
+        elif problems[i]["list"] == problems[j]["list"] and score < SIM_SAME_LIST:
+            ok, why = False, "mesma lista, score baixo"
+        out.append((i, j, cos, cont, ok, why))
+    out.sort(key=lambda r: -max(r[2], r[3]))
+    return out
+
+def attach_similar(problems, lists, excluded, debug=False):
+    """Fill p['similar'] and p['group'] in place. Returns (n_pairs, n_groups)."""
+    by_list = {l["id"]: l for l in lists}
+    scored = sim_pairs(problems, excluded)
+    neigh = defaultdict(list)
+    parent = list(range(len(problems)))
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]; x = parent[x]
+        return x
+    accepted = 0
+    for i, j, cos, cont, ok, _ in scored:
+        if not ok:
+            continue
+        accepted += 1
+        s = round(max(cos, cont), 3)
+        neigh[i].append((j, s)); neigh[j].append((i, s))
+        parent[find(i)] = find(j)
+    comps = defaultdict(list)
+    for i in range(len(problems)):
+        if neigh[i]:
+            comps[find(i)].append(i)
+    groups = {}
+    for k, (_, members) in enumerate(sorted(comps.items(), key=lambda kv: kv[1][0]), 1):
+        gid = f"g{k}"
+        for i in members:
+            groups[i] = gid
+    for i, p in enumerate(problems):
+        near = sorted(neigh[i], key=lambda x: (-x[1], problems[x[0]]["id"]))[:SIM_MAX]
+        p["similar"] = [{"id": problems[j]["id"], "score": s} for j, s in near]
+        p["group"] = groups.get(i)
+    if debug:
+        print(f"\n{'='*100}\n## problemas parecidos — {accepted} pares aceitos de {len(scored)} candidatos"
+              f" (cos>={SIM_COS} ou cont>={SIM_CONT} com cos>={SIM_CONT_COS})")
+        for i, j, cos, cont, ok, why in scored:
+            a, b = problems[i], problems[j]
+            la, lb = by_list[a["list"]], by_list[b["list"]]
+            flag = "OK " if ok else "-- "
+            print(f"{flag} cos={cos:.3f} cont={cont:.3f}{'' if ok else '   (' + why + ')'}")
+            for p, l in ((a, la), (b, lb)):
+                print(f"      {p['id']:<26} {l['author']:<14} {l['year']} {l['label']:<16} {p['title'] or '—'}")
+        sizes = Counter()
+        for i, gid in groups.items():
+            sizes[gid] += 1
+        print(f"\n## {len(sizes)} grupos: "
+              + ", ".join(f"{count} com {size} problemas" for size, count in sorted(Counter(sizes.values()).items())))
+        for gid, n in sizes.most_common():
+            if n <= SIM_BIG_GROUP:
+                continue
+            print(f"   ATENÇÃO grupo grande ({n}): " + ", ".join(p["id"] for p in problems if p.get("group") == gid))
+    return accepted, len(set(groups.values()))
+
 # ----------------------------------------------------------------------------- main
 def main():
     catalog = json.load(open(os.path.join(ROOT, "data", "catalog.json"), encoding="utf-8"))
@@ -313,6 +478,11 @@ def main():
     ov_path = os.path.join(ROOT, "data", "overrides.json")
     if os.path.exists(ov_path):
         overrides = json.load(open(ov_path, encoding="utf-8"))
+    sim_excluded = set()
+    sim_path = os.path.join(ROOT, "data", "similar_overrides.json")
+    if os.path.exists(sim_path):
+        sim_ov = json.load(open(sim_path, encoding="utf-8"))
+        sim_excluded = {tuple(sorted(pair)) for pair in sim_ov.get("exclude", [])}
     authors, lists, problems = {}, [], []
     months = ["janeiro","fevereiro","marco","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"]
     for entry in catalog:
@@ -363,11 +533,14 @@ def main():
             for p in problems[-len(probs):] if probs else []:
                 src = f" ({p['source']})" if p["source"] else ""
                 print(f"   {p['label']:>4} p{p['page']} [{p['topic']:<12}] {'*'*(p['stars'] or 0):<4} {p['title'] or '—'}{src}  | {p['text'][:70]}")
+    n_pairs, n_groups = attach_similar(problems, lists, sim_excluded, debug=DEBUG)
     out = {"generated": datetime.date.today().isoformat(), "topics": [{"id": t, "label": l} for t, l in TOPICS],
            "authors": authors, "lists": lists, "problems": problems}
     js = "window.FOICE = " + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n"
     open(os.path.join(ROOT, "data", "problems.js"), "w", encoding="utf-8").write(js)
     print(f"{len(lists)} listas, {len(problems)} problemas -> data/problems.js ({len(js)//1024} KB)")
+    print(f"{n_pairs} pares parecidos em {n_groups} grupos"
+          + (f", {len(sim_excluded)} excluídos à mão" if sim_excluded else ""))
     print(Counter(p["topic"] for p in problems).most_common())
     print("lists with < 3 problems:", [(l['file'], l['problems']) for l in lists if l['problems'] < 3])
 

@@ -112,6 +112,8 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .card.solved .title { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ink) 40%, transparent); text-decoration-thickness: 1px; }
 .card .tags { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
 .card .stars { margin-left: auto; color: var(--accent); letter-spacing: .05em; font-size: 12px; }
+.versions { border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 7px; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .04em; color: var(--ink-3); white-space: nowrap; }
 .card .title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 1.2; color: var(--ink); letter-spacing: -.005em; }
 .card .title .num { color: var(--ink-3); font-weight: 500; font-style: italic; }
 .card .meta { font-size: 12.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 4px 6px; }
@@ -164,6 +166,18 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .panel .statement { padding: 14px 18px; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; border-bottom: 1px solid var(--line); max-height: 32vh; overflow: auto; }
 .panel .statement p { margin: 0 0 8px; }
 .panel .statement small { color: var(--ink-3); font-size: 12px; }
+.panel .similar { padding: 12px 18px 14px; border-bottom: 1px solid var(--line); max-height: 30vh; overflow: auto; background: var(--bg); }
+.panel .similar h3 { margin: 0 0 8px; font: 600 11.5px var(--font-ui); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.panel .similar h3 b { font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.panel .similar ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.simrow { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; width: 100%; text-align: left; cursor: pointer;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.simrow:hover { border-color: var(--accent); }
+.simrow .simtitle { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--ink); }
+.simrow .simmeta { font-size: 12.5px; color: var(--ink-3); }
+.simrow .simtag { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--ink-3);
+  border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.panel .similar small { display: block; margin-top: 8px; color: var(--ink-3); font-size: 12px; }
 .panel .viewer { flex: 1; background: #525659; position: relative; min-height: 0; }
 .panel iframe { width: 100%; height: 100%; border: 0; display: block; }
 .panel .viewer .hint { position: absolute; inset: auto 12px 12px; background: var(--paper); color: var(--ink-2); font-size: 12.5px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line-2); opacity: .95; }
@@ -191,6 +205,7 @@ kbd.k { font: 500 11px/1 var(--font-ui); border: 1px solid var(--line-2); border
 @media (max-width: 1099px) {
   .panel { width: min(100vw, 720px); }
   .panel .statement { max-height: none; flex: 1; }
+  .panel .similar { max-height: 42vh; }
   .panel .viewer { display: none; }
 }
 @media (max-width: 640px) {
@@ -211,6 +226,6 @@ kbd.k { font: 500 11px/1 var(--font-ui); border: 1px solid var(--line-2); border
   .progress .bar { flex: 1; }
   .reset { margin-left: 0; }
   .panel header { padding: 14px 14px 10px; }
-  .panel .actions, .panel .statement { padding-left: 14px; padding-right: 14px; }
+  .panel .actions, .panel .statement, .panel .similar { padding-left: 14px; padding-right: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
