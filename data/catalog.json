@@ -1,0 +1,364 @@
+[
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo3.pdf",
+  "label": "Lista 3"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo4.pdf",
+  "label": "Lista 4"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo5.pdf",
+  "label": "Lista 5"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo6.pdf",
+  "label": "Lista 6"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo7.pdf",
+  "label": "Lista 7"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo8.pdf",
+  "label": "Lista 8"
+ },
+ {
+  "year": 2019,
+  "author": "Rafael Timbó",
+  "file": "listas/2019/Timbo/lista2019timbo9.pdf",
+  "label": "Lista 9"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos3.pdf",
+  "label": "Lista 3"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos4.pdf",
+  "label": "Lista 4",
+  "hint": "relatividade"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos5.pdf",
+  "label": "Lista 5"
+ },
+ {
+  "year": 2019,
+  "author": "Victor Bastos",
+  "file": "listas/2019/Bastos/lista2019bastos5dlc.pdf",
+  "label": "Lista 5 - DLC"
+ },
+ {
+  "year": 2019,
+  "author": "Luciano Leão",
+  "file": "listas/2019/Luciano/lista2019luciano1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2019,
+  "author": "Luciano Leão",
+  "file": "listas/2019/Luciano/lista2019luciano2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2019,
+  "author": "Levy Bruno",
+  "file": "listas/2019/Levy/lista2019levy1.pdf",
+  "label": "Lista 1",
+  "hint": "circuitos"
+ },
+ {
+  "year": 2019,
+  "author": "Paulo Kitayama",
+  "file": "listas/2019/Paulo/lista2019paulo1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel1parte1.pdf",
+  "label": "Lista 1 parte 1"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel1parte2.pdf",
+  "label": "Lista 1 parte 2"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel3.pdf",
+  "label": "Lista 3"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel4.pdf",
+  "label": "Lista 4"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel5.pdf",
+  "label": "Lista 5"
+ },
+ {
+  "year": 2020,
+  "author": "Davi Maciel",
+  "file": "listas/2020/Maciel/lista2020maciel6.pdf",
+  "label": "Lista 6"
+ },
+ {
+  "year": 2020,
+  "author": "Vinícius Ferreira",
+  "file": "listas/2020/Vinicius/lista2020vinicius1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2020,
+  "author": "Vinícius Ferreira",
+  "file": "listas/2020/Vinicius/lista2020vinicius2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2020,
+  "author": "Vinícius Ferreira",
+  "file": "listas/2020/Vinicius/lista2020vinicius3.pdf",
+  "label": "Lista 3"
+ },
+ {
+  "year": 2020,
+  "author": "Ygor de Santana",
+  "file": "listas/2020/Ygor/lista2020ygor1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2020,
+  "author": "Ygor de Santana",
+  "file": "listas/2020/Ygor/lista2020ygor2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2020,
+  "author": "Gabriel Capelo",
+  "file": "listas/2020/Capelo/lista2020capelo1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2020,
+  "author": "Vinicius Névoa",
+  "file": "listas/2020/Nevoa/lista2020nevoa1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2020,
+  "author": "Rafael Basto",
+  "file": "listas/2020/Rafael/lista2020rafael1.pdf",
+  "label": "Lista 1",
+  "hint": "mecanica"
+ },
+ {
+  "year": 2021,
+  "author": "Antônio Ítalo",
+  "file": "listas/2021/Italo/lista2021italo1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2021,
+  "author": "Antônio Ítalo",
+  "file": "listas/2021/Italo/lista2021italo2.pdf",
+  "label": "Lista 2",
+  "hint": "eletro"
+ },
+ {
+  "year": 2021,
+  "author": "Antônio Ítalo",
+  "file": "listas/2021/Italo/lista2021italo3.pdf",
+  "label": "Lista 3"
+ },
+ {
+  "year": 2021,
+  "author": "Matheus Ponciano",
+  "file": "listas/2021/Ponciano/lista2021ponciano1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2021,
+  "author": "Matheus Ponciano",
+  "file": "listas/2021/Ponciano/lista2021ponciano2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2021,
+  "author": "Eduarda Freitas",
+  "file": "listas/2021/Eduarda/lista2021eduarda1.pdf",
+  "label": "Lista 1",
+  "hint": "termo"
+ },
+ {
+  "year": 2021,
+  "author": "Felipe Ribeiro",
+  "file": "listas/2021/Felipe/lista2021felipe1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2021,
+  "author": "Vinicius Névoa",
+  "file": "listas/2021/Nevoa/lista2021nevoa1.pdf",
+  "label": "Lista 1",
+  "hint": "relatividade"
+ },
+ {
+  "year": 2022,
+  "author": "Caio Augusto",
+  "file": "listas/2022/Caio/lista2022caio1.pdf",
+  "label": "Lista 1",
+  "hint": "ondas"
+ },
+ {
+  "year": 2022,
+  "author": "Ualype Uchôa",
+  "file": "listas/2022/Ualype/lista2022ualype1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2022,
+  "author": "Ualype Uchôa",
+  "file": "listas/2022/Ualype/lista2022ualype2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2024,
+  "author": "Paulo Henrique",
+  "file": "listas/2024/PauloHenrique/lista2024paulohenrique1.pdf",
+  "label": "Lista 1",
+  "hint": "gravitacao"
+ },
+ {
+  "year": 2024,
+  "author": "Paulo Henrique",
+  "file": "listas/2024/PauloHenrique/lista2024paulohenrique2.pdf",
+  "label": "Lista 2",
+  "hint": "relatividade"
+ },
+ {
+  "year": 2024,
+  "author": "Gabriel Hemétrio",
+  "file": "listas/2024/Hemetrio/lista2024hemetrio1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2024,
+  "author": "Gabriel Hemétrio",
+  "file": "listas/2024/Hemetrio/lista2024hemetrio2.pdf",
+  "label": "Lista 2"
+ },
+ {
+  "year": 2024,
+  "author": "Akira Ito",
+  "file": "listas/2024/Akira/lista2024akira1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2024,
+  "author": "Lucas Tavares",
+  "file": "listas/2024/Tavares/lista2024tavares1.pdf",
+  "label": "Lista 1",
+  "hint": "eletro"
+ },
+ {
+  "year": 2024,
+  "author": "Rafael Sena",
+  "file": "listas/2024/Sena/lista2024sena1.pdf",
+  "label": "Lista 1",
+  "hint": "optica"
+ },
+ {
+  "year": 2024,
+  "author": "Gabriel Baptista",
+  "file": "listas/2024/Baptista/lista2024baptista1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2024,
+  "author": "Jônatas Augusto",
+  "file": "listas/2024/Jonatas/lista2024jonatas1.pdf",
+  "label": "Lista 1",
+  "hint": "mecanica"
+ },
+ {
+  "year": 2025,
+  "author": "João Victor Evers",
+  "file": "listas/2025/Evers/lista2025evers1.pdf",
+  "label": "Lista 1",
+  "hint": "eletro"
+ },
+ {
+  "year": 2025,
+  "author": "Arthur Gurjão",
+  "file": "listas/2025/Gurjao/lista2025gurjao1.pdf",
+  "label": "Lista 1"
+ },
+ {
+  "year": 2025,
+  "author": "Lucas Tavares",
+  "file": "listas/2025/Tavares/lista2025tavares1.pdf",
+  "label": "Lista 1",
+  "hint": "relatividade"
+ },
+ {
+  "year": 2025,
+  "author": "Vitor Takashi",
+  "file": "listas/2025/Takashi/lista2025takashi1.pdf",
+  "label": "Lista 1"
+ }
+]
