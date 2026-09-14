@@ -144,7 +144,7 @@
     const title = p.title ? highlight(p.title, toks) : `<span class="num">Problema ${esc(p.label)}</span>`;
     const probNo = p.title ? ` · problema ${esc(p.label)}` : "";
     const src = p.source ? ` · <span title="fonte citada na lista">${esc(p.source)}</span>` : "";
-    return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" style="--c: var(--t-${p.topic})" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
+    return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
       <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${starsHtml(p)}</div>
       <h3 class="title">${title}</h3>
       <div class="meta"><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year} · p.&nbsp;${p.page}${src}</div>
@@ -171,7 +171,7 @@
     const toks = tokens();
     for (const p of D.problems) if (baseFilter(p, { skipTopic: true }) && (!toks.length || matches(p, toks))) { counts[p.topic] = (counts[p.topic] || 0) + 1; total++; }
     els.chips.innerHTML = `<button class="chip all" aria-pressed="${!state.topic}" data-topic="">Todos <b>${total}</b></button>` +
-      topics.map((t) => `<button class="chip" style="--c: var(--t-${t.id})" aria-pressed="${state.topic === t.id}" data-topic="${t.id}"><i></i>${esc(t.label)} <b>${counts[t.id] || 0}</b></button>`).join("");
+      topics.map((t) => `<button class="chip" aria-pressed="${state.topic === t.id}" data-topic="${t.id}">${esc(t.label)} <b>${counts[t.id] || 0}</b></button>`).join("");
   }
   function renderSubfilters() {
     els.year.innerHTML = `<option value="">Todos os anos</option>` + years.map((y) => `<option value="${y}" ${String(y) === state.year ? "selected" : ""}>${y}</option>`).join("");
@@ -210,13 +210,12 @@
       const ls = byYear[y]; const byAuthor = {};
       for (const l of ls) (byAuthor[l.author] ||= []).push(l);
       const np = ls.reduce((s, l) => s + l.problems, 0);
-      return `<section class="year"><h2>${y}</h2><p class="yhint">${Object.keys(byAuthor).length} autores · ${ls.length} listas · ${np} problemas · turma que se preparava para a IPhO ${y}</p>
+      const na = Object.keys(byAuthor).length;
+      return `<section class="year"><h2>${y}</h2><p class="yhint">${na} ${na === 1 ? "autor" : "autores"} · ${ls.length} ${ls.length === 1 ? "lista" : "listas"} · ${np} problemas</p>
         <div class="authors">${Object.entries(byAuthor).map(([a, al]) => {
-          const t = {}; al.forEach((l) => Object.entries(l.topics).forEach(([k, v]) => t[k] = (t[k] || 0) + v));
-          const dots = Object.entries(t).sort((x, z) => z[1] - x[1]).map(([k, v]) => `<i style="background:var(--t-${k})" title="${esc(topicLabel[k])}: ${v}"></i>`).join("");
-          return `<div class="author"><h3>${esc(D.authors[a])}</h3><div class="sum">${al.reduce((s, l) => s + l.problems, 0)} problemas em ${al.length} ${al.length === 1 ? "lista" : "listas"} <span class="ltopics">${dots}</span></div>
-            <div class="lists">${al.map((l) => `<div class="lrow"><span class="lname">${esc(l.label)}</span><span class="lmeta">${l.problems} probl. · ${l.pages} p.${l.date ? " · " + esc(fmtDate(l.date)) : ""}</span><span class="sp"></span>
-              <button data-list="${l.id}" title="Ver os problemas desta lista">Problemas</button><a href="${l.file}" target="_blank" rel="noopener" title="Abrir o PDF">PDF ↗</a></div>`).join("")}</div></div>`;
+          const tot = al.reduce((s, l) => s + l.problems, 0);
+          return `<div class="author"><h3>${esc(D.authors[a])}</h3>${al.length > 1 ? `<div class="sum">${tot} problemas em ${al.length} listas</div>` : ""}
+            <div class="lists">${al.map((l) => `<div class="lrow"><button class="lmain" data-list="${l.id}" title="Ver os problemas desta lista"><span class="lname">${esc(l.label)}</span><span class="lmeta">${l.problems} ${l.problems === 1 ? "problema" : "problemas"}</span></button><a class="lpdf" href="${l.file}" target="_blank" rel="noopener" title="Abrir o PDF">PDF ↗</a></div>`).join("")}</div></div>`;
         }).join("")}</div></section>`;
     }).join("");
   }
@@ -233,7 +232,6 @@
     if (prev) $$(`[data-id="${prev}"]`).forEach((el) => el.classList.remove("active"));
     $$(`[data-id="${id}"]`).forEach((el) => el.classList.add("active"));
     const i = current.findIndex((x) => x.id === id);
-    els.panel.style.setProperty("--c", `var(--t-${p.topic})`);
     $(".ptags", els.panel).innerHTML = `<span>${esc(topicLabel[p.topic])}</span>${starsHtml(p)}`;
     $("h2", els.panel).textContent = p.displayTitle;
     $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages}${p.source ? ` · fonte: ${esc(p.source)}` : ""}`;
