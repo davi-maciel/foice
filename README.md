@@ -6,7 +6,7 @@ Site estático (sem build no deploy), hospedado na Vercel em https://ipho.com.br
 
 ## Estrutura
 
-- `index.html`, `assets/style.css`, `assets/app.js` — o site: busca instantânea, filtros por tema/ano/autor/dificuldade, leitor que abre o PDF na página do problema, sorteio de problema e progresso ("resolvido") salvo no navegador. A visão "Listas" mantém a organização original por ano e autor.
+- `index.html`, `assets/base.css`, `assets/ui/*.css`, `assets/app.js` — o site: busca instantânea, filtros por tema/ano/autor/dificuldade, leitor que abre o PDF na página do problema, sorteio de problema e progresso ("resolvido") salvo no navegador. A visão "Listas" mantém a organização original por ano e autor.
 - `listas/<ano>/<Autor>/lista<ano><autor><n>.pdf` — os PDFs originais. O ano indica para qual edição da IPhO os alunos se preparavam.
 - `data/catalog.json` — catálogo das listas: ano, autor, arquivo, rótulo e, opcionalmente, `hint` com o tema predominante da lista.
 - `data/problems.js` — índice gerado: um registro por problema (título, página, tema, dificuldade quando o autor marcou, trecho do enunciado, problemas parecidos).
@@ -47,3 +47,18 @@ Os limiares atuais foram ajustados lendo esse relatório par a par. Duas coisas 
 
 - **5-gramas de caracteres funcionam pior que 3-gramas de palavras** para o containment. Problemas como "esfera uniformemente polarizada" e "esfera uniformemente magnetizada" são problemas *diferentes* escritos quase com as mesmas letras, e os n-gramas de caracteres não os separam.
 - **Traduções não batem.** As listas em inglês (Caio 2022, Rafael 2020, Ponciano 2021 lista 2) não são reconhecidas como iguais às suas versões em português, porque a comparação é sobre palavras. É uma limitação aceita: encontrar esses pares exigiria tradução ou embeddings, e o site não tem build nem dependência externa.
+
+## Aparências (UIs)
+
+O mesmo HTML e o mesmo `app.js` servem seis aparências, trocadas pelo seletor "UI" no cabeçalho (a escolha fica salva no navegador e vai no `#ui=` da URL). `assets/base.css` tem só a mecânica compartilhada (painel, acessibilidade, resets); cada arquivo em `assets/ui/` é uma UI completa e independente, com suas próprias fontes (Google Fonts) e sem JavaScript extra:
+
+| Arquivo | Ideia | Inspiração |
+| --- | --- | --- |
+| `atual.css` | papel quente, cartões, dourado | design original do banco |
+| `jornal.css` | índice editorial em colunas, serifa, filetes, vermelho de tinta | sumário das Feynman Lectures, Typewolf, Public Domain Review |
+| `terminal.css` | mono, uma linha por problema, âmbar sobre azul-noite | Advent of Code, U.S. Graphics, Brutalist Websites, arquivo do Project Euler |
+| `suico.css` | grotesca enorme, grade de 1px, preto/branco + um vermelho | Grilli Type, Klim, sites tipográficos do Siteinspire |
+| `cartaz.css` | bordas grossas, sombras duras, amarelo/azul/vermelho, formas | faixas do catálogo Klim, cartazes Bauhaus, neobrutalismo do Land-book |
+| `biblioteca.css` | verde-couro e dourado, Garamond, sumário com pontilhado | Stripe Press, Whole Earth Index, sumários impressos |
+
+Para criar outra: copie um arquivo de `assets/ui/`, acrescente o nome à lista `UIS` em `index.html` (script inline) e em `assets/app.js`, e uma `<option>` no seletor.

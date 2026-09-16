@@ -1,4 +1,7 @@
-/* FOICE — banco de problemas ------------------------------------------------ */
+/* UI "Atual" — o design original do banco de problemas.
+   Inspiração: apps de referência quentes e discretos (papel, dourado, Fraunces + Inter). */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap");
+
 :root {
   --bg: #f7f4ee;
   --bg-2: #efeae0;
@@ -26,9 +29,6 @@
     color-scheme: dark;
   }
 }
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
   font: 15px/1.5 var(--font-ui); font-feature-settings: "cv11", "ss01";
@@ -37,7 +37,6 @@ a { color: var(--accent-ink); text-decoration-color: color-mix(in srgb, var(--ac
 a:hover { text-decoration-color: currentColor; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 
 /* header ------------------------------------------------------------------- */
@@ -51,6 +50,9 @@ button { font: inherit; color: inherit; }
 nav.views { margin-left: auto; display: flex; gap: 4px; background: var(--bg-2); padding: 4px; border-radius: 999px; border: 1px solid var(--line); }
 nav.views button { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; color: var(--ink-2); cursor: pointer; font-weight: 500; }
 nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: var(--shadow); }
+.uiswitch { appearance: none; border: 1px solid var(--line-2); background: var(--paper); color: var(--ink-2); border-radius: 999px; padding: 6px 28px 6px 12px; font: 500 13px var(--font-ui); cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%); background-position: right 15px center, right 10px center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+.uiswitch:hover { border-color: var(--accent); }
 .gh { color: var(--ink-3); display: inline-flex; padding: 6px; border-radius: 8px; }
 .gh:hover { color: var(--ink); }
 
@@ -161,8 +163,7 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 @media (max-width: 640px) { .groups { grid-template-columns: 1fr; } }
 
 /* detail panel --------------------------------------------------------------- */
-.panel { position: fixed; inset: 0 0 0 auto; width: min(58vw, 900px); background: var(--paper); border-left: 1px solid var(--line-2); box-shadow: -20px 0 60px -30px rgba(0,0,0,.35); z-index: 40; display: none; flex-direction: column; }
-.panel[open] { display: flex; }
+.panel { background: var(--paper); border-left: 1px solid var(--line-2); box-shadow: -20px 0 60px -30px rgba(0,0,0,.35); }
 .panel header { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
 .panel header .grow { flex: 1; min-width: 0; }
 .panel .ptags { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
@@ -189,20 +190,12 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .simrow .simtag { margin-left: auto; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--ink-3);
   border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .panel .similar small { display: block; margin-top: 8px; color: var(--ink-3); font-size: 12px; }
-.panel .viewer { flex: 1; background: #525659; position: relative; min-height: 0; }
-.panel iframe { width: 100%; height: 100%; border: 0; display: block; }
+.panel .viewer { background: #525659; }
 .panel .viewer .hint { position: absolute; inset: auto 12px 12px; background: var(--paper); color: var(--ink-2); font-size: 12.5px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line-2); opacity: .95; }
-.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 30; display: none; }
-.scrim[open] { display: block; }
-body.panel-open { overflow: hidden; }
 @media (min-width: 1100px) and (max-width: 1500px) {
   body.panel-open .brand span { display: none; }
 }
-@media (min-width: 1100px) {
-  body.panel-open { overflow: auto; }
-  body.panel-open .scrim { display: none; }
-  body.panel-open .wrap { max-width: none; padding-right: calc(min(58vw, 900px) + 20px); }
-}
+
 
 /* footer ------------------------------------------------------------------- */
 footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--ink-3); font-size: 13.5px; }
@@ -217,10 +210,8 @@ kbd.k { font: 500 11px/1 var(--font-ui); border: 1px solid var(--line-2); border
 
 /* responsive ---------------------------------------------------------------- */
 @media (max-width: 1099px) {
-  .panel { width: min(100vw, 720px); }
   .panel .statement { max-height: none; flex: 1; }
   .panel .similar { max-height: 42vh; }
-  .panel .viewer { display: none; }
 }
 @media (max-width: 640px) {
   .wrap { padding: 0 16px; }
@@ -242,4 +233,3 @@ kbd.k { font: 500 11px/1 var(--font-ui); border: 1px solid var(--line-2); border
   .panel header { padding: 14px 14px 10px; }
   .panel .actions, .panel .statement, .panel .similar { padding-left: 14px; padding-right: 14px; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

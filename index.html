@@ -8,8 +8,19 @@
   <link rel="icon" href="imagens/logofoice.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/base.css">
+  <script>
+    // Escolhe a UI antes da primeira pintura (evita piscar). Ordem: hash `ui=` > localStorage > "atual".
+    (function () {
+      var UIS = ["atual", "jornal", "terminal", "suico", "cartaz", "biblioteca"];
+      var m = /(?:^#|[#&])ui=([a-z]+)/.exec(location.hash), ui = m && m[1];
+      try { ui = ui || localStorage.getItem("foice:ui"); } catch (e) {}
+      if (UIS.indexOf(ui) === -1) ui = "atual";
+      document.documentElement.dataset.ui = ui;
+      document.write('<link id="uiCss" rel="stylesheet" href="assets/ui/' + ui + '.css">');
+    })();
+  </script>
+  <noscript><link rel="stylesheet" href="assets/ui/atual.css"></noscript>
 </head>
 <body>
   <header class="top">
@@ -23,6 +34,15 @@
         <button data-view="listas" aria-pressed="false">Listas</button>
         <button data-view="repetidos" aria-pressed="false">Repetidos</button>
       </nav>
+      <label class="sr-only" for="uiSwitch">Aparência do site</label>
+      <select id="uiSwitch" class="uiswitch" title="Trocar a aparência do site">
+        <option value="atual">UI: Atual</option>
+        <option value="jornal">UI: Jornal</option>
+        <option value="terminal">UI: Terminal</option>
+        <option value="suico">UI: Suíço</option>
+        <option value="cartaz">UI: Cartaz</option>
+        <option value="biblioteca">UI: Biblioteca</option>
+      </select>
       <a class="gh" href="https://github.com/davi-maciel/foice" target="_blank" rel="noopener" title="Código e PDFs no GitHub">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
       </a>

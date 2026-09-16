@@ -73,6 +73,7 @@
       if (v && !(k === "view" && v === "problemas") && !(k === "sort" && v === "recentes")) sp.set(hk, v);
     }
     if (state.hideSolved) sp.set("hs", "1");
+    if (currentUi() !== "atual") sp.set("ui", currentUi());
     const s = sp.toString().replace(/%2C/g, ",");
     history.replaceState(null, "", s ? "#" + s : location.pathname + location.search);
   }
@@ -316,10 +317,26 @@
   }
   let toastT; function toast(msg) { els.toast.textContent = msg; els.toast.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => els.toast.classList.remove("show"), 2200); }
 
+  // ------------------------------------------------------------------ UI switcher (assets/ui/*.css)
+  const UIS = ["atual", "jornal", "terminal", "suico", "cartaz", "biblioteca"];
+  function currentUi() { return document.documentElement.dataset.ui || "atual"; }
+  function setUi(ui) {
+    if (!UIS.includes(ui) || ui === currentUi()) return;
+    const old = $("#uiCss");
+    const link = document.createElement("link"); link.rel = "stylesheet"; link.href = `assets/ui/${ui}.css`;
+    link.addEventListener("load", () => { old && old.remove(); link.id = "uiCss"; });
+    document.head.appendChild(link);
+    document.documentElement.dataset.ui = ui;
+    try { localStorage.setItem("foice:ui", ui); } catch { /* private mode */ }
+    writeHash();
+  }
+
   // ------------------------------------------------------------------ wire up
   function init() {
     Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q"), similar: $("#similar"), repetidos: $("#viewRepetidos"), groups: $("#groups") });
     readHash();
+    const sw = $("#uiSwitch"); sw.value = currentUi();
+    sw.addEventListener("change", () => setUi(sw.value));
     els.q.value = state.q; $(".search").classList.toggle("has-q", !!state.q);
     $("#statTotal").textContent = D.problems.length; $("#statLists").textContent = D.lists.length; $("#statAuthors").textContent = Object.keys(D.authors).length;
     $("#statYears").textContent = `${Math.min(...years)}–${Math.max(...years)}`;
@@ -366,7 +383,7 @@
       else if (state.open && (e.key === "ArrowRight" || e.key === "j")) nav(1);
       else if (state.open && (e.key === "ArrowLeft" || e.key === "k")) nav(-1);
     });
-    window.addEventListener("hashchange", () => { const before = JSON.stringify(state); readHash(); if (JSON.stringify(state) !== before) { els.q.value = state.q; render(); if (state.open) openDetail(state.open); else closeDetail(); } });
+    window.addEventListener("hashchange", () => { const m = /(?:^#|[#&])ui=([a-z]+)/.exec(location.hash); if (m && UIS.includes(m[1])) { setUi(m[1]); $("#uiSwitch").value = m[1]; } const before = JSON.stringify(state); readHash(); if (JSON.stringify(state) !== before) { els.q.value = state.q; render(); if (state.open) openDetail(state.open); else closeDetail(); } });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
 })();

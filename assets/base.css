@@ -1,0 +1,39 @@
+/* base.css — regras funcionais compartilhadas por todas as UIs (assets/ui/*.css).
+   Nada aqui é visual: só mecânica de painel, acessibilidade e resets. */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+button, select, input { font: inherit; color: inherit; }
+img { max-width: 100%; }
+:root { --panel-w: min(58vw, 900px); }
+
+/* painel de detalhe + scrim */
+.panel { position: fixed; inset: 0 0 0 auto; width: var(--panel-w); z-index: 40; display: none; flex-direction: column; max-width: 100vw; }
+.panel[open] { display: flex; }
+.panel .viewer { flex: 1; min-height: 0; position: relative; }
+.panel iframe { width: 100%; height: 100%; border: 0; display: block; }
+.scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, .28); z-index: 30; display: none; }
+.scrim[open] { display: block; }
+body.panel-open { overflow: hidden; }
+@media (min-width: 1100px) {
+  body.panel-open { overflow: auto; }
+  body.panel-open .scrim { display: none; }
+  body.panel-open .wrap { max-width: none; padding-right: calc(var(--panel-w) + 20px); }
+  body.panel-open .top .wrap { flex-wrap: wrap; }
+}
+@media (max-width: 1099px) {
+  .panel { width: min(100vw, 720px); }
+  .panel .viewer { display: none; }
+}
+
+/* grade: itens de largura total */
+.grid .empty, .grid .more { grid-column: 1 / -1; }
+.card .snippet { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* toast */
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; transition: all .2s; z-index: 60; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
