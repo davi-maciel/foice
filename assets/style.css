@@ -46,7 +46,7 @@ button { font: inherit; color: inherit; }
 .top .wrap { display: flex; align-items: center; gap: 18px; min-height: 60px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
 .brand img { height: 34px; width: auto; display: block; background: #fff; border-radius: 6px; padding: 2px 6px; }
-.brand span { font-family: var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: .01em; }
+.brand span { font-family: var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: .01em; white-space: nowrap; }
 .brand small { display: block; font: 500 11px/1 var(--font-ui); color: var(--ink-3); text-transform: uppercase; letter-spacing: .12em; margin-top: 3px; }
 nav.views { margin-left: auto; display: flex; gap: 4px; background: var(--bg-2); padding: 4px; border-radius: 999px; border: 1px solid var(--line); }
 nav.views button { border: 0; background: transparent; padding: 6px 14px; border-radius: 999px; color: var(--ink-2); cursor: pointer; font-weight: 500; }
@@ -112,8 +112,9 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .card.solved .title { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ink) 40%, transparent); text-decoration-thickness: 1px; }
 .card .tags { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
 .card .stars { margin-left: auto; color: var(--accent); letter-spacing: .05em; font-size: 12px; }
-.versions { border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 7px; font-size: 10.5px; font-weight: 600;
-  letter-spacing: .04em; color: var(--ink-3); white-space: nowrap; }
+.versions { border: 1px solid var(--line-2); background: transparent; border-radius: 999px; padding: 1px 7px; font: 600 10.5px var(--font-ui);
+  letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; cursor: pointer; }
+.versions:hover { border-color: var(--accent); color: var(--ink); }
 .card .title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 1.2; color: var(--ink); letter-spacing: -.005em; }
 .card .title .num { color: var(--ink-3); font-weight: 500; font-style: italic; }
 .card .meta { font-size: 12.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 4px 6px; }
@@ -148,6 +149,16 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .lmain .lmeta { color: var(--ink-3); font-size: 12.5px; white-space: nowrap; }
 .lpdf { display: inline-flex; align-items: center; font-size: 12.5px; padding: 0 11px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink-2); background: var(--bg); text-decoration: none; white-space: nowrap; }
 .lpdf:hover { border-color: var(--accent); color: var(--ink); }
+
+/* repetidos view ------------------------------------------------------------ */
+.groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 14px; padding: 6px 0 60px; align-items: start; }
+.grp { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px 12px; transition: box-shadow .2s, border-color .2s; }
+.grp.focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.grp header { display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.grp h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 1.2; }
+.grp .gmeta { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.lrow.solved .lname { text-decoration: line-through; color: var(--ink-3); }
+@media (max-width: 640px) { .groups { grid-template-columns: 1fr; } }
 
 /* detail panel --------------------------------------------------------------- */
 .panel { position: fixed; inset: 0 0 0 auto; width: min(58vw, 900px); background: var(--paper); border-left: 1px solid var(--line-2); box-shadow: -20px 0 60px -30px rgba(0,0,0,.35); z-index: 40; display: none; flex-direction: column; }
@@ -184,6 +195,9 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 30; display: none; }
 .scrim[open] { display: block; }
 body.panel-open { overflow: hidden; }
+@media (min-width: 1100px) and (max-width: 1500px) {
+  body.panel-open .brand span { display: none; }
+}
 @media (min-width: 1100px) {
   body.panel-open { overflow: auto; }
   body.panel-open .scrim { display: none; }

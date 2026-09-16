@@ -55,16 +55,16 @@
   }
 
   // ------------------------------------------------------------------ state <-> URL hash
-  const state = { view: "problemas", q: "", topic: "", year: "", author: "", list: "", diff: "", sort: "recentes", hideSolved: false, open: null, shown: 72 };
-  const HASH_KEYS = { q: "q", topic: "t", year: "y", author: "a", list: "l", diff: "d", sort: "s", view: "v", open: "p" };
+  const state = { view: "problemas", q: "", topic: "", year: "", author: "", list: "", diff: "", sort: "recentes", hideSolved: false, open: null, shown: 72, group: "" };
+  const HASH_KEYS = { q: "q", topic: "t", year: "y", author: "a", list: "l", diff: "d", sort: "s", view: "v", open: "p", group: "g" };
   function readHash() {
     const h = location.hash.replace(/^#\/?/, "");
     const sp = new URLSearchParams(h);
-    Object.assign(state, { view: "problemas", q: "", topic: "", year: "", author: "", list: "", diff: "", sort: "recentes", open: null });
+    Object.assign(state, { view: "problemas", q: "", topic: "", year: "", author: "", list: "", diff: "", sort: "recentes", open: null, group: "" });
     for (const [k, hk] of Object.entries(HASH_KEYS)) if (sp.has(hk)) state[k] = sp.get(hk);
     state.hideSolved = sp.get("hs") === "1";
-    if (!["problemas", "listas"].includes(state.view)) state.view = "problemas";
-    if (!["recentes", "antigos", "dificuldade", "repetidos", "aleatorio", "relevancia"].includes(state.sort)) state.sort = "recentes";
+    if (!["problemas", "listas", "repetidos"].includes(state.view)) state.view = "problemas";
+    if (!["recentes", "antigos", "dificuldade", "aleatorio", "relevancia"].includes(state.sort)) state.sort = "recentes";
   }
   function writeHash() {
     const sp = new URLSearchParams();
@@ -114,7 +114,6 @@
     else if (sort === "recentes") arr.sort((a, b) => b.year - a.year || byList(a, b));
     else if (sort === "antigos") arr.sort((a, b) => a.year - b.year || byList(a, b));
     else if (sort === "dificuldade") arr.sort((a, b) => (a.stars || 9) - (b.stars || 9) || b.year - a.year || byList(a, b));
-    else if (sort === "repetidos") arr.sort((a, b) => b.versions - a.versions || b.year - a.year || byList(a, b));
     else if (sort === "aleatorio") arr.sort((a, b) => rng(a.idx) - rng(b.idx));
     return arr;
   }
@@ -145,7 +144,7 @@
     return "…" + t.slice(start + 1, start + 220);
   }
   const starsHtml = (p) => p.stars ? `<span class="stars" title="dificuldade indicada pelo autor">${STAR.repeat(p.stars)}</span>` : "";
-  const versionsHtml = (p) => p.versions > 1 ? `<span class="versions" title="este problema aparece em ${p.versions} listas">${p.versions} versões</span>` : "";
+  const versionsHtml = (p) => p.versions > 1 ? `<button class="versions" data-group="${esc(p.group)}" title="Ver as ${p.versions} versões deste problema">${p.versions} versões</button>` : "";
   const pdfHref = (p, page) => `${p.L.file}#page=${page || p.page}`;
   function cardHtml(p, toks) {
     const title = p.title ? highlight(p.title, toks) : `<span class="num">Problema ${esc(p.label)}</span>`;
@@ -169,8 +168,10 @@
     $$("nav.views button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
     els.problemas.hidden = state.view !== "problemas";
     els.listas.hidden = state.view !== "listas";
+    els.repetidos.hidden = state.view !== "repetidos";
     if (state.view === "problemas") { renderChips(); renderSubfilters(); renderGrid(); }
-    else renderLists();
+    else if (state.view === "listas") renderLists();
+    else renderGroups();
     renderProgress();
   }
   function renderChips() {
@@ -225,6 +226,30 @@
             <div class="lists">${al.map((l) => `<div class="lrow"><button class="lmain" data-list="${l.id}" title="Ver os problemas desta lista"><span class="lname">${esc(l.label)}</span><span class="lmeta">${l.problems} ${l.problems === 1 ? "problema" : "problemas"}</span></button><a class="lpdf" href="${l.file}" target="_blank" rel="noopener" title="Abrir o PDF">PDF ↗</a></div>`).join("")}</div></div>`;
         }).join("")}</div></section>`;
     }).join("");
+  }
+  const groups = (() => {
+    const by = {};
+    for (const p of D.problems) if (p.group) (by[p.group] ||= []).push(p);
+    return Object.entries(by).map(([id, members]) => {
+      members.sort((a, b) => a.year - b.year || listOrder[a.list] - listOrder[b.list] || a.n - b.n);
+      const titled = members.filter((m) => m.title);
+      const topic = Object.entries(members.reduce((c, m) => (c[m.topic] = (c[m.topic] || 0) + 1, c), {})).sort((a, b) => b[1] - a[1])[0][0];
+      return { id, members, title: (titled[0] || members[0]).displayTitle, topic, years: [...new Set(members.map((m) => m.year))] };
+    }).sort((a, b) => b.members.length - a.members.length || a.members[0].year - b.members[0].year || a.title.localeCompare(b.title, "pt"));
+  })();
+  function renderGroups() {
+    const np = groups.reduce((s, g) => s + g.members.length, 0);
+    $("#groupsHint").innerHTML = `<b>${np} problemas</b> em <b>${groups.length} grupos</b>. Problemas que voltaram em outra lista, às vezes com outro título ou mais itens. A comparação é automática, feita sobre os enunciados, e pode errar.`;
+    els.groups.innerHTML = groups.map((g) => `<article class="grp${state.group === g.id ? " focus" : ""}" id="grp-${esc(g.id)}">
+      <header><h3>${esc(g.title)}</h3><span class="gmeta">${esc(topicLabel[g.topic])} · ${g.members.length} versões · ${g.years.join(", ")}</span></header>
+      <div class="lists">${g.members.map((m) => `<div class="lrow${isSolved(m.id) ? " solved" : ""}" data-id="${m.id}"><button class="lmain" data-open="${m.id}" title="Abrir este problema">
+        <span class="lname">${esc(m.displayTitle)}</span><span class="lmeta">${esc(m.authorName)} · ${esc(m.L.label)} · ${m.year}${m.title ? ` · problema ${esc(m.label)}` : ""} · p. ${m.page}</span></button>
+        <a class="lpdf" href="${pdfHref(m)}" target="_blank" rel="noopener" title="Abrir o PDF na página ${m.page}">PDF ↗</a></div>`).join("")}</div></article>`).join("");
+    if (state.group) { const el = $(`#grp-${state.group}`); if (el) requestAnimationFrame(() => el.scrollIntoView({ block: "start", behavior: "smooth" })); }
+  }
+  function goToGroup(gid) {
+    state.view = "repetidos"; state.group = gid; render();
+    setTimeout(() => { state.group = ""; writeHash(); $$(".grp.focus").forEach((el) => el.classList.remove("focus")); }, 2500);
   }
   function fmtDate(d) {
     const m = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
@@ -293,7 +318,7 @@
 
   // ------------------------------------------------------------------ wire up
   function init() {
-    Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q"), similar: $("#similar") });
+    Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q"), similar: $("#similar"), repetidos: $("#viewRepetidos"), groups: $("#groups") });
     readHash();
     els.q.value = state.q; $(".search").classList.toggle("has-q", !!state.q);
     $("#statTotal").textContent = D.problems.length; $("#statLists").textContent = D.lists.length; $("#statAuthors").textContent = Object.keys(D.authors).length;
@@ -319,6 +344,7 @@
       if (e.target.closest("#emptyReset")) { resetAll(); return; }
       const card = e.target.closest(".card"); if (!card) return;
       if (e.target.closest(".solve")) { toggleSolved(card.dataset.id); return; }
+      if (e.target.closest(".versions")) { closeDetail(); goToGroup(e.target.closest(".versions").dataset.group); return; }
       if (e.target.closest("a.open")) return;   // let the link open the PDF
       openDetail(card.dataset.id);
     });
@@ -327,6 +353,8 @@
     $("#closeBtn").addEventListener("click", closeDetail); els.scrim.addEventListener("click", closeDetail);
     $("#prevBtn").addEventListener("click", () => nav(-1)); $("#nextBtn").addEventListener("click", () => nav(1));
     els.similar.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(b.dataset.open, { scroll: true }); });
+    $(".ptags", els.panel).addEventListener("click", (e) => { const b = e.target.closest(".versions"); if (b) { closeDetail(); goToGroup(b.dataset.group); } });
+    els.groups.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(b.dataset.open); });
     $("#panelSolve").addEventListener("click", () => toggleSolved(state.open));
     $("#panelRandom").addEventListener("click", random);
     document.addEventListener("keydown", (e) => {

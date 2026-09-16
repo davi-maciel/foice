@@ -21,6 +21,7 @@
       <nav class="views" aria-label="Seções">
         <button data-view="problemas" aria-pressed="true">Problemas</button>
         <button data-view="listas" aria-pressed="false">Listas</button>
+        <button data-view="repetidos" aria-pressed="false">Repetidos</button>
       </nav>
       <a class="gh" href="https://github.com/davi-maciel/foice" target="_blank" rel="noopener" title="Código e PDFs no GitHub">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
@@ -65,7 +66,6 @@
           <option value="recentes">Mais recentes primeiro</option>
           <option value="antigos">Mais antigos primeiro</option>
           <option value="dificuldade">Por dificuldade</option>
-          <option value="repetidos">Mais repetidos</option>
           <option value="aleatorio">Ordem aleatória</option>
           <option value="relevancia" hidden>Relevância</option>
         </select></span>
@@ -87,6 +87,14 @@
         <p>Organizadas por ano e por autor. Os anos indicam para qual edição da IPhO os alunos estavam se preparando. Clique numa lista para ver só os problemas dela, ou abra o PDF.</p>
       </div>
       <div class="years" id="years"></div>
+    </section>
+
+    <section id="viewRepetidos" hidden>
+      <div class="hero">
+        <h1>Repetidos</h1>
+        <p id="groupsHint">Problemas que voltaram em outra lista, às vezes com outro título ou mais itens, reunidos em grupos. A comparação é automática, feita sobre os enunciados.</p>
+      </div>
+      <div class="groups" id="groups"></div>
     </section>
   </main>
 
