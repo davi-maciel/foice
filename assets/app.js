@@ -2,6 +2,7 @@
 (function () {
   "use strict";
   const D = window.FOICE;
+  const CROPS = window.FOICE_CROPS || {};
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -274,8 +275,17 @@
     $("#posInfo", els.panel).textContent = i === -1 ? "" : `${i + 1} / ${current.length}`;
     renderPanelSolved();
     renderSimilar(p);
-    const frame = $("iframe", els.panel);
-    if (isDesktop()) { const src = `${p.L.file}#page=${p.page}&navpanes=0&view=FitH`; if (frame.getAttribute("src") !== src) frame.setAttribute("src", src); }
+    const frame = $("iframe", els.panel), crop = $(".cropimg", els.panel);
+    if (CROPS[p.id]) {
+      const [w, h] = CROPS[p.id];
+      crop.src = `data/crops/${p.id}.png`; crop.width = w; crop.height = h; crop.hidden = false;
+      frame.hidden = true; if (frame.getAttribute("src") !== "about:blank") frame.setAttribute("src", "about:blank");
+      els.panel.classList.add("has-crop");
+    } else {
+      crop.hidden = true; crop.removeAttribute("src"); frame.hidden = false; els.panel.classList.remove("has-crop");
+      if (isDesktop()) { const src = `${p.L.file}#page=${p.page}&navpanes=0&view=FitH`; if (frame.getAttribute("src") !== src) frame.setAttribute("src", src); }
+    }
+    $(".viewer", els.panel).scrollTop = 0;
     els.panel.setAttribute("open", ""); els.scrim.setAttribute("open", ""); document.body.classList.add("panel-open");
     if (scroll) { const card = $(`.card[data-id="${id}"]`); if (card) card.scrollIntoView({ block: "center", behavior: "smooth" }); }
   }

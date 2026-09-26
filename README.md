@@ -14,6 +14,7 @@ Site estático (sem build no deploy), hospedado na Vercel em https://ipho.com.br
 - `data/similar_overrides.json` — pares que o cálculo de semelhança acha parecidos mas que não são o mesmo problema.
 - `scripts/build_index.py` e `scripts/pdftext.py` — extraem o texto dos PDFs e geram `data/problems.js`.
 - `problemas/<lista>/<n>.tex` — transcrições em LaTeX dos enunciados (piloto), com `problemas/preamble.tex`, as figuras recortadas dos PDFs em `problemas/<lista>/fig/` e os metadados de recorte em `problemas/figuras.json` e `problemas/recortes.json`.
+- `data/crops/<id>.png` e `data/crops.js` — recorte de cada problema no seu PDF (título até o título seguinte, seguindo colunas e páginas), gerado por `scripts/crop_problems.py`; o painel mostra esse recorte e, sem ele, cai no visualizador de PDF.
 - `scripts/build_tex.py` — compila cada transcrição (Tectonic) e a compara com o PDF original: similaridade do texto extraído, lista de palavras que diferem e uma imagem lado a lado em `build/tex/<id>-cmp.png`.
 
 ## Adicionar uma lista
@@ -49,6 +50,10 @@ Os limiares atuais foram ajustados lendo esse relatório par a par. Duas coisas 
 
 - **5-gramas de caracteres funcionam pior que 3-gramas de palavras** para o containment. Problemas como "esfera uniformemente polarizada" e "esfera uniformemente magnetizada" são problemas *diferentes* escritos quase com as mesmas letras, e os n-gramas de caracteres não os separam.
 - **Traduções não batem.** As listas em inglês (Caio 2022, Rafael 2020, Ponciano 2021 lista 2) não são reconhecidas como iguais às suas versões em português, porque a comparação é sobre palavras. É uma limitação aceita: encontrar esses pares exigiria tradução ou embeddings, e o site não tem build nem dependência externa.
+
+## Recortes dos problemas
+
+`python3 scripts/crop_problems.py [ids ou listas]` (precisa de `pip install pypdfium2 pillow`) localiza cada problema pelas posições dos títulos no layout, junta os trechos de cada coluna/página numa imagem só, inclui figuras da faixa e exclui cabeçalhos, rodapés e notas. Sem argumentos, recorta tudo. Regenerar depois de mexer no parser (`build_index.py`), porque os índices vêm dele.
 
 ## Design
 

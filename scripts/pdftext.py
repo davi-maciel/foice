@@ -78,7 +78,11 @@ def page_lines(layout, gutter=18):
         if r["x0"] < mid - gutter and r["x1"] > mid + gutter: return "full"
         return "left" if (r["x0"] + r["x1"]) / 2 < mid else "right"
     kinds = [kind(r) for r in raw]
-    two_col = kinds.count("left") >= 3 and kinds.count("right") >= 3
+    # duas colunas de verdade: várias linhas à esquerda e várias à direita cujo início (x0) coincide;
+    # equações centradas e fins de parágrafo curtos não se alinham assim.
+    from collections import Counter
+    right_starts = Counter(round(r["x0"] / 3) for r, k in zip(raw, kinds) if k == "right" and r["x0"] > mid - gutter)
+    two_col = kinds.count("left") >= 3 and bool(right_starts) and max(right_starts.values()) >= 3
     # --- merge same-row fragments
     raw.sort(key=lambda r: -(r["y0"] + r["y1"]) / 2)
     rows = []
@@ -103,27 +107,34 @@ def page_lines(layout, gutter=18):
         row["text"] = re.sub(r"\s+", " ", " ".join(t for _, t in sorted(row["parts"]))).strip()
     # --- order rows
     rows.sort(key=lambda r: (-(r["y0"] + r["y1"]) / 2, r["x0"]))
+    for r in rows: r["kind"] = kind(r) if two_col else "full"
     if not two_col:
-        return [r["text"] for r in rows]
+        return rows
     out, block = [], []
     def flush():
         for side in ("left", "right"):
-            out.extend(r["text"] for r in block if kind(r) == side)
+            out.extend(r for r in block if r["kind"] == side)
         block.clear()
     for r in rows:
-        if kind(r) == "full":
-            flush(); out.append(r["text"])
+        if r["kind"] == "full":
+            flush(); out.append(r)
         else:
             block.append(r)
     flush()
     return out
 
-def extract(pdf):
-    """Return list of pages; each page is a list of text lines in reading order."""
+def extract_rows(pdf):
+    """Per page: {"w", "h", "rows": [{"text", "x0", "x1", "y0", "y1", "kind"}]} in reading order (PDF points, y up)."""
     pages = []
     for layout in extract_pages(pdf, laparams=LAParams(line_margin=0.3, char_margin=2.0, boxes_flow=0.5)):
-        pages.append(page_lines(layout))
+        rows = page_lines(layout)
+        pages.append({"w": layout.width, "h": layout.height,
+                      "rows": [{k: r[k] for k in ("text", "x0", "x1", "y0", "y1", "kind")} for r in rows]})
     return pages
+
+def extract(pdf):
+    """Return list of pages; each page is a list of text lines in reading order."""
+    return [[r["text"] for r in pg["rows"]] for pg in extract_rows(pdf)]
 
 if __name__ == "__main__":
     import sys

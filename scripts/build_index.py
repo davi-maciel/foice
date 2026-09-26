@@ -138,13 +138,13 @@ def parse_list(pages):
     style = min(PRIORITY, key=lambda st: (-scores[st][0], scores[st][1], PRIORITY.index(st)))
     if scores[style][0] == 0:
         return [], None, None
-    problems, exp, gab_page = [], 1, None
+    problems, exp, gab_page, gab_row = [], 1, None, None
     i = 0
     while i < len(lines):
         pi, line = lines[i]
         s = line.strip()
         if END_RE.match(s) and len(problems) >= 2:
-            gab_page = pi; break
+            gab_page, gab_row = pi, i; break
         c = candidates(style, s)
         ok = c is not None and accept(style, c, exp)[0]
         if not ok:
@@ -186,8 +186,11 @@ def parse_list(pages):
         kind = "theory" if title and THEORY_RE.match(title) else "problem"
         if kind == "theory": title = None
         problems.append({"n": len(problems) + 1, "label": label, "title": title or None, "stars": stars,
-                         "page": pi, "kind": kind, "_body": ([(pi, body_first)] if body_first else [])})
+                         "page": pi, "kind": kind, "_body": ([(pi, body_first)] if body_first else []),
+                         "_row": i, "_row_end": None})
         i = j
+    for a, b in zip(problems, problems[1:]): a["_row_end"] = b["_row"]
+    if problems: problems[-1]["_row_end"] = gab_row if gab_row is not None else len(lines)
     problems = [p for p in problems if p["kind"] == "problem"]
     for k, p in enumerate(problems, 1): p["n"] = k
     return problems, gab_page, style
