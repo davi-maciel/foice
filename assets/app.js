@@ -265,9 +265,8 @@
     if (prev) $$(`[data-id="${prev}"]`).forEach((el) => el.classList.remove("active"));
     $$(`[data-id="${id}"]`).forEach((el) => el.classList.add("active"));
     const i = current.findIndex((x) => x.id === id);
-    $(".ptags", els.panel).innerHTML = `<span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}`;
     $("h2", els.panel).textContent = p.displayTitle;
-    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages}${p.source ? ` · fonte: ${esc(p.source)}` : ""}`;
+    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages} · <span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.source ? ` · fonte: ${esc(p.source)}` : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
     $("#openPdf", els.panel).href = pdfHref(p);
     $("#openPdf", els.panel).lastElementChild.textContent = ` Abrir PDF na p. ${p.page}`;
     const gab = $("#openGab", els.panel);
@@ -369,7 +368,7 @@
     $("#closeBtn").addEventListener("click", closeDetail); els.scrim.addEventListener("click", closeDetail);
     $("#prevBtn").addEventListener("click", () => nav(-1)); $("#nextBtn").addEventListener("click", () => nav(1));
     els.similar.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(b.dataset.open, { scroll: true }); });
-    $(".ptags", els.panel).addEventListener("click", (e) => { const b = e.target.closest(".versions"); if (b) { closeDetail(); goToGroup(b.dataset.group); } });
+    $(".pmeta", els.panel).addEventListener("click", (e) => { const b = e.target.closest(".versions"); if (b) { closeDetail(); goToGroup(b.dataset.group); } });
     els.groups.addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(b.dataset.open); });
     $("#panelSolve").addEventListener("click", () => toggleSolved(state.open));
     $("#panelRandom").addEventListener("click", random);

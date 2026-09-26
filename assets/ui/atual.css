@@ -166,7 +166,6 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
 .panel { background: var(--paper); border-left: 1px solid var(--line-2); box-shadow: -20px 0 60px -30px rgba(0,0,0,.35); }
 .panel header { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
 .panel header .grow { flex: 1; min-width: 0; }
-.panel .ptags { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
 .panel h2 { margin: 0 0 4px; font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.15; }
 .panel .pmeta { color: var(--ink-3); font-size: 13px; }
 .panel .pmeta b { color: var(--ink-2); font-weight: 500; }
@@ -229,3 +228,5 @@ kbd.k { font: 500 11px/1 var(--font-ui); border: 1px solid var(--line-2); border
   .panel header { padding: 14px 14px 10px; }
   .panel .actions, .panel .similar { padding-left: 14px; padding-right: 14px; }
 }
+.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; }
+.panel .pmeta .stars { letter-spacing: .08em; }

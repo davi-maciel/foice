@@ -164,7 +164,6 @@ nav.views button[aria-pressed="true"]::before, nav.views button[aria-pressed="tr
 .panel { background: var(--bg); border-left: 1px solid var(--amber); }
 .panel header { display: flex; align-items: flex-start; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line-2); background: var(--bg-2); }
 .panel header .grow { flex: 1; min-width: 0; }
-.panel .ptags { display: flex; align-items: center; gap: 10px; font-size: 11px; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
 .panel h2 { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: var(--amber-2); }
 .panel .pmeta { color: var(--fg-2); font-size: 12px; }
 .panel .pmeta b { color: var(--fg); font-weight: 400; }
@@ -222,3 +221,5 @@ kbd.k::before { content: "["; color: var(--dim); } kbd.k::after { content: "]"; 
   .panel header, .panel .actions, .panel .similar { padding-left: 12px; padding-right: 12px; }
 }
 @media (min-width: 1100px) { body.panel-open .card { grid-template-columns: minmax(0, 1fr) auto; } body.panel-open .card .tags { grid-column: 1 / -1; grid-row: 1; flex-direction: row; gap: 10px; padding-top: 0; } body.panel-open .card .title { grid-column: 1; grid-row: 2; } body.panel-open .card .meta { grid-column: 1 / -1; grid-row: 3; } body.panel-open .card .snippet { display: none; } body.panel-open .card .foot { grid-column: 2; grid-row: 2; flex-direction: row; } }
+.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; }
+.panel .pmeta .stars { letter-spacing: .08em; }

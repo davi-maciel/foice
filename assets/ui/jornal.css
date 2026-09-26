@@ -19,7 +19,7 @@ a:hover { text-decoration-color: var(--red); color: var(--red); }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
-.kicker, .card .tags, .chips, .subfilters, .grp .gmeta, .panel .ptags, .panel .similar h3, footer h4, .lmeta, .card .meta, .simmeta, .yhint, .author .sum, .lpdf, .card .foot, .resultbar {
+.kicker, .card .tags, .chips, .subfilters, .grp .gmeta, .panel .similar h3, footer h4, .lmeta, .card .meta, .simmeta, .yhint, .author .sum, .lpdf, .card .foot, .resultbar {
   font-family: var(--ui); }
 
 /* masthead */
@@ -148,7 +148,6 @@ nav.views button[aria-pressed="true"] { color: var(--red); text-decoration: unde
 .panel { background: var(--paper); border-left: 3px double var(--rule); }
 .panel header { display: flex; align-items: flex-start; gap: 10px; padding: 18px 22px 14px; border-bottom: 1px solid var(--rule); }
 .panel header .grow { flex: 1; min-width: 0; }
-.panel .ptags { display: flex; align-items: center; gap: 10px; font: 600 10.5px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
 .panel h2 { margin: 0 0 6px; font: 700 30px/1.1 var(--display); letter-spacing: -.01em; }
 .panel .pmeta { font: italic 14px var(--text); color: var(--ink-3); }
 .panel .pmeta b { color: var(--ink-2); font-weight: 400; font-style: normal; }
@@ -208,3 +207,5 @@ kbd.k { font: 600 10px var(--ui); border: 1px solid var(--rule-soft); padding: 2
 }
 @media (max-width: 1099px) { .panel .similar { max-height: none; flex: 1; } }
 @media (min-width: 1100px) { body.panel-open .grid { column-count: 1; } body.panel-open .hero h1 { font-size: 52px; } body.panel-open .brand span { display: none; } }
+.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; }
+.panel .pmeta .stars { letter-spacing: .08em; }

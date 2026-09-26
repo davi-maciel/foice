@@ -18,7 +18,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 button { cursor: pointer; }
 :focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
-.sc, nav.views button, .chip, .card .tags, .lpdf, .card .foot .open, .solve, .gmeta, .yhint, .panel .ptags, .panel .similar h3, footer h4, .versions, .btn, .simtag, .author .sum, .reset, .resultbar .progress {
+.sc, nav.views button, .chip, .card .tags, .lpdf, .card .foot .open, .solve, .gmeta, .yhint, .panel .similar h3, footer h4, .versions, .btn, .simtag, .author .sum, .reset, .resultbar .progress {
   font-family: var(--text); font-variant-caps: small-caps; letter-spacing: .08em; text-transform: lowercase; }
 
 /* cabeçalho */
@@ -149,7 +149,6 @@ nav.views button[aria-pressed="true"] { color: var(--gold-2); border-bottom-colo
 .panel { background: var(--bg-2); border-left: 1px solid var(--gold); }
 .panel header { display: flex; align-items: flex-start; gap: 10px; padding: 18px 22px 14px; border-bottom: 1px solid var(--gold-line); }
 .panel header .grow { flex: 1; min-width: 0; }
-.panel .ptags { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gold); margin-bottom: 6px; }
 .panel h2 { margin: 0 0 6px; font: 600 32px/1.1 var(--display); color: var(--cream); }
 .panel .pmeta { font: italic 15px var(--text); color: var(--dim); }
 .panel .pmeta b { color: var(--cream-2); font-weight: 400; font-style: normal; }
@@ -211,3 +210,5 @@ kbd.k { font: 400 12px var(--text); border: 1px solid var(--gold-line); padding:
   .panel header, .panel .actions, .panel .similar { padding-left: 16px; padding-right: 16px; }
 }
 @media (min-width: 1100px) { body.panel-open .grid { column-count: 1; } body.panel-open .hero h1 { font-size: 52px; } body.panel-open .brand span, body.panel-open .brand small { display: none; } }
+.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; }
+.panel .pmeta .stars { letter-spacing: .08em; }
