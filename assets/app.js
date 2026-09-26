@@ -280,14 +280,19 @@
       const [w, h, pt, scale] = CROPS[p.id];
       // mostra o recorte no tamanho em que o texto do PDF fica com ~16px, como o texto do site
       crop.src = `data/crops/${p.id}.png`; crop.width = w; crop.height = h; crop.hidden = false;
-      crop.style.width = (pt && scale) ? `${Math.round((w / scale) * (16 / pt))}px` : "";
+      const cssW = (pt && scale) ? Math.round((w / scale) * (16 / pt)) : 560;
+      crop.style.width = `${cssW + 44}px`;   // inclui as margens laterais (box-sizing: border-box); no celular cai para 100%
+      // o painel abraça o recorte (imagem + margens), entre 460px e 60% da janela
+      const pw = Math.max(460, Math.min(cssW + 46, Math.round(window.innerWidth * 0.6), 780));
+      document.documentElement.style.setProperty("--panel-w", `${pw}px`);
       frame.hidden = true; if (frame.getAttribute("src") !== "about:blank") frame.setAttribute("src", "about:blank");
       els.panel.classList.add("has-crop");
     } else {
       crop.hidden = true; crop.removeAttribute("src"); frame.hidden = false; els.panel.classList.remove("has-crop");
+      document.documentElement.style.removeProperty("--panel-w");
       if (isDesktop()) { const src = `${p.L.file}#page=${p.page}&navpanes=0&view=FitH`; if (frame.getAttribute("src") !== src) frame.setAttribute("src", src); }
     }
-    $(".viewer", els.panel).scrollTop = 0;
+    $(".pbody", els.panel).scrollTop = 0;
     els.panel.setAttribute("open", ""); els.scrim.setAttribute("open", ""); document.body.classList.add("panel-open");
     if (scroll) { const card = $(`.card[data-id="${id}"]`); if (card) card.scrollIntoView({ block: "center", behavior: "smooth" }); }
   }
