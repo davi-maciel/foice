@@ -187,8 +187,6 @@ nav.views button[aria-pressed="true"]::before, nav.views button[aria-pressed="tr
 .simtag::before { content: "# "; }
 .panel .similar small { display: block; margin-top: 6px; color: var(--dim); font-size: 12px; }
 .panel .viewer { background: #1a1f28; }
-.panel .viewer .hint { position: absolute; inset: auto 10px 10px; background: var(--bg-2); color: var(--fg-2); font-size: 12px; padding: 6px 10px; border: 1px solid var(--line-2); }
-
 footer { border-top: 1px solid var(--line-2); padding: 22px 0 50px; color: var(--dim); font-size: 12px; margin-top: 20px; }
 footer .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
 footer h4 { margin: 0 0 6px; color: var(--fg-2); font-size: 12px; font-weight: 700; text-transform: uppercase; }

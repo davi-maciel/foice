@@ -187,7 +187,6 @@ nav.views button[aria-pressed="true"] { background: var(--paper); color: var(--i
   border: 1px solid var(--line-2); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .panel .similar small { display: block; margin-top: 8px; color: var(--ink-3); font-size: 12px; }
 .panel .viewer { background: #525659; }
-.panel .viewer .hint { position: absolute; inset: auto 12px 12px; background: var(--paper); color: var(--ink-2); font-size: 12.5px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line-2); opacity: .95; }
 @media (min-width: 1100px) and (max-width: 1500px) {
   body.panel-open .brand span { display: none; }
 }
