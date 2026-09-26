@@ -277,8 +277,10 @@
     renderSimilar(p);
     const frame = $("iframe", els.panel), crop = $(".cropimg", els.panel);
     if (CROPS[p.id]) {
-      const [w, h] = CROPS[p.id];
+      const [w, h, pt, scale] = CROPS[p.id];
+      // mostra o recorte no tamanho em que o texto do PDF fica com ~16px, como o texto do site
       crop.src = `data/crops/${p.id}.png`; crop.width = w; crop.height = h; crop.hidden = false;
+      crop.style.width = (pt && scale) ? `${Math.round((w / scale) * (16 / pt))}px` : "";
       frame.hidden = true; if (frame.getAttribute("src") !== "about:blank") frame.setAttribute("src", "about:blank");
       els.panel.classList.add("has-crop");
     } else {

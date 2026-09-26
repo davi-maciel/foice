@@ -216,7 +216,7 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .panel .similar small { display: block; margin-top: 8px; color: var(--gray-3); font-size: 12px; }
 .panel .viewer { background: #2b2b2b; overflow: auto; }
 .panel.has-crop .viewer { background: var(--white); }
-.panel .cropimg { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; padding: 18px 22px 40px; box-sizing: border-box; }
+.panel .cropimg { display: block; width: 100%; max-width: 100%; height: auto; margin: 0; padding: 22px 22px 48px; box-sizing: content-box; }
 /* rodapé em faixa preta */
 footer { background: var(--black); color: #bdbdbd; padding: 34px 0 60px; font-size: 13px; }
 footer .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }

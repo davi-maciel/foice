@@ -129,7 +129,7 @@ def extract_rows(pdf):
     for layout in extract_pages(pdf, laparams=LAParams(line_margin=0.3, char_margin=2.0, boxes_flow=0.5)):
         rows = page_lines(layout)
         pages.append({"w": layout.width, "h": layout.height,
-                      "rows": [{k: r[k] for k in ("text", "x0", "x1", "y0", "y1", "kind")} for r in rows]})
+                      "rows": [{k: r[k] for k in ("text", "x0", "x1", "y0", "y1", "kind", "size")} for r in rows]})
     return pages
 
 def extract(pdf):

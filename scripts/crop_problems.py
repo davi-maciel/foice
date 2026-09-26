@@ -146,7 +146,10 @@ def process_list(lid, wanted, scale, debug, crops):
         img = render_rects(pdf, rects, scale)
         img = img.quantize(colors=128, method=Image.Quantize.FASTOCTREE)
         img.save(os.path.join(OUT, f"{pid}.png"), optimize=True)
-        crops[pid] = [img.width, img.height]
+        # tamanho da fonte do corpo (pt): mediana das linhas do problema sem o título
+        sizes = sorted(r["size"] for k, (p2, r) in enumerate(flat) if p["_row"] < k < p["_row_end"] and not is_chrome(r, pages[p2 - 1], author) and len(r["text"]) > 20)
+        pt = sizes[len(sizes) // 2] if sizes else flat[p["_row"]][1]["size"]
+        crops[pid] = [img.width, img.height, round(pt, 1), scale]
         size = os.path.getsize(os.path.join(OUT, f"{pid}.png")) // 1024
         print(f"== {pid} {'/'.join(f'p{r[0]}' for r in rects)} {img.width}x{img.height} {size} KB" + (f"\n   {[(r[0], round(r[1]), round(r[2]), round(r[3]), round(r[4])) for r in rects]}" if debug else ""))
 
