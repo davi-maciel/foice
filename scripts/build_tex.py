@@ -104,8 +104,27 @@ def build(pid):
         cmp_img = right
     cmp_img.save(os.path.join(OUT, f"{pid}-cmp.png"))
     print(f"== {pid}: texto {ratio:.3f}" + ("" if not diffs else "\n   " + "\n   ".join(diffs[:12])))
+    st_path = os.path.join(OUT, "status.json")
+    st = json.load(open(st_path)) if os.path.exists(st_path) else {}
+    st[pid] = {"ratio": round(ratio, 3), "diffs": len(diffs)}
+    json.dump(st, open(st_path, "w"), indent=0)
+
+def status():
+    """Tabela por lista: transcritos/total e similaridade mínima registrada no último build."""
+    st_path = os.path.join(OUT, "status.json")
+    st = json.load(open(st_path)) if os.path.exists(st_path) else {}
+    tot_done = 0
+    print(f"{'lista':<24} {'feito':>7}  {'sim. mín.':>9}")
+    for l in DATA["lists"]:
+        ids = [p["id"] for p in DATA["problems"] if p["list"] == l["id"]]
+        done = [i for i in ids if os.path.exists(os.path.join(PROB, l["id"], f"{i.rsplit('-', 1)[1]}.tex"))]
+        tot_done += len(done)
+        ratios = [st[i]["ratio"] for i in done if i in st]
+        if done: print(f"{l['id']:<24} {len(done):>3}/{len(ids):<3}  {min(ratios) if ratios else float('nan'):>9.3f}")
+    print(f"{'total':<24} {tot_done:>3}/{len(DATA['problems'])}")
 
 if __name__ == "__main__":
+    if "--status" in sys.argv: status(); sys.exit()
     ids = sys.argv[1:] or sorted(os.path.basename(os.path.dirname(t)) + "-" + os.path.splitext(os.path.basename(t))[0]
                                  for t in glob.glob(os.path.join(PROB, "*", "*.tex")))
     for pid in ids: build(pid)
