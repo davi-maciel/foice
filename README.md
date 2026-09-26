@@ -50,7 +50,7 @@ Os limiares atuais foram ajustados lendo esse relatório par a par. Duas coisas 
 
 ## Aparências (UIs)
 
-O mesmo HTML e o mesmo `app.js` servem seis aparências, trocadas pelo seletor "UI" no cabeçalho (a escolha fica salva no navegador e vai no `#ui=` da URL). `assets/base.css` tem só a mecânica compartilhada (painel, acessibilidade, resets); cada arquivo em `assets/ui/` é uma UI completa e independente, com suas próprias fontes (Google Fonts) e sem JavaScript extra:
+O mesmo HTML e o mesmo `app.js` servem cinco aparências, trocadas pelo seletor "UI" no cabeçalho (a escolha fica salva no navegador e vai no `#ui=` da URL). `assets/base.css` tem só a mecânica compartilhada (painel, acessibilidade, resets); cada arquivo em `assets/ui/` é uma UI completa e independente, com suas próprias fontes (Google Fonts) e sem JavaScript extra:
 
 | Arquivo | Ideia | Inspiração |
 | --- | --- | --- |
@@ -58,7 +58,6 @@ O mesmo HTML e o mesmo `app.js` servem seis aparências, trocadas pelo seletor "
 | `jornal.css` | índice editorial em colunas, serifa, filetes, vermelho de tinta | sumário das Feynman Lectures, Typewolf, Public Domain Review |
 | `terminal.css` | mono, uma linha por problema, âmbar sobre azul-noite | Advent of Code, U.S. Graphics, Brutalist Websites, arquivo do Project Euler |
 | `suico.css` | grotesca enorme, grade de 1px, preto/branco + um vermelho | Grilli Type, Klim, sites tipográficos do Siteinspire |
-| `cartaz.css` | bordas grossas, sombras duras, amarelo/azul/vermelho, formas | faixas do catálogo Klim, cartazes Bauhaus, neobrutalismo do Land-book |
 | `biblioteca.css` | verde-couro e dourado, Garamond, sumário com pontilhado | Stripe Press, Whole Earth Index, sumários impressos |
 
 Para criar outra: copie um arquivo de `assets/ui/`, acrescente o nome à lista `UIS` em `index.html` (script inline) e em `assets/app.js`, e uma `<option>` no seletor.

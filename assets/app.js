@@ -316,7 +316,7 @@
   let toastT; function toast(msg) { els.toast.textContent = msg; els.toast.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => els.toast.classList.remove("show"), 2200); }
 
   // ------------------------------------------------------------------ UI switcher (assets/ui/*.css)
-  const UIS = ["atual", "jornal", "terminal", "suico", "cartaz", "biblioteca"];
+  const UIS = ["atual", "jornal", "terminal", "suico", "biblioteca"];
   function currentUi() { return document.documentElement.dataset.ui || "atual"; }
   function setUi(ui) {
     if (!UIS.includes(ui) || ui === currentUi()) return;

@@ -12,7 +12,7 @@
   <script>
     // Escolhe a UI antes da primeira pintura (evita piscar). Ordem: hash `ui=` > localStorage > "atual".
     (function () {
-      var UIS = ["atual", "jornal", "terminal", "suico", "cartaz", "biblioteca"];
+      var UIS = ["atual", "jornal", "terminal", "suico", "biblioteca"];
       var m = /(?:^#|[#&])ui=([a-z]+)/.exec(location.hash), ui = m && m[1];
       try { ui = ui || localStorage.getItem("foice:ui"); } catch (e) {}
       if (UIS.indexOf(ui) === -1) ui = "atual";
@@ -40,7 +40,6 @@
         <option value="jornal">UI: Jornal</option>
         <option value="terminal">UI: Terminal</option>
         <option value="suico">UI: Suíço</option>
-        <option value="cartaz">UI: Cartaz</option>
         <option value="biblioteca">UI: Biblioteca</option>
       </select>
       <a class="gh" href="https://github.com/davi-maciel/foice" target="_blank" rel="noopener" title="Código e PDFs no GitHub">
