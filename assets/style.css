@@ -30,9 +30,11 @@ body.panel-open { overflow: hidden; }
   body.panel-open .top .wrap { flex-wrap: wrap; }
 }
 @media (max-width: 1099px) {
-  .panel { width: min(100vw, 720px); }
+  .panel { width: min(100vw, 720px); overflow-x: hidden; }
+  .panel .pbody { overflow-x: hidden; }
   .panel .viewer { display: none; }
   .panel.has-crop .viewer { display: block; }
+  .panel .cropimg { width: 100% !important; padding: 16px 16px 40px; }   /* padrão: cabe na largura; o zoom fica por conta do usuário */
 }
 
 /* grade: itens de largura total */
