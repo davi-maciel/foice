@@ -160,9 +160,6 @@ nav.views button[aria-pressed="true"] { color: var(--gold-2); border-bottom-colo
 .panel .actions .btn { padding: 7px 12px; font-size: 14px; }
 .panel .actions .solve { margin-left: 0; border: 1px solid var(--gold-line); padding: 7px 12px; }
 #posInfo { font: italic 14px var(--text); color: var(--dim); }
-.panel .statement { padding: 16px 22px; color: var(--cream); font-size: 17px; line-height: 1.55; border-bottom: 1px solid var(--gold-line); max-height: 32vh; overflow: auto; }
-.panel .statement p { margin: 0 0 8px; }
-.panel .statement small { color: var(--dim); font: italic 13px var(--text); }
 .panel .similar { padding: 12px 22px 16px; border-bottom: 1px solid var(--gold-line); max-height: 30vh; overflow: auto; background: var(--bg); }
 .panel .similar h3 { margin: 0 0 6px; font-size: 13px; color: var(--gold); font-weight: 400; }
 .panel .similar h3 b { color: var(--cream); }
@@ -185,7 +182,7 @@ footer code { color: var(--cream-2); font-size: 13px; }
 kbd.k { font: 400 12px var(--text); border: 1px solid var(--gold-line); padding: 1px 6px; color: var(--cream-2); }
 .toast { background: var(--gold); color: var(--bg); padding: 10px 16px; font: 500 15px var(--text); }
 
-@media (max-width: 1099px) { .panel .statement { max-height: none; flex: 1; } .panel .similar { max-height: 42vh; } }
+@media (max-width: 1099px) { .panel .similar { max-height: none; flex: 1; } }
 @media (max-width: 900px) { .grid { column-count: 1; } }
 @media (max-width: 640px) {
   .wrap { padding: 0 18px; }
@@ -211,6 +208,6 @@ kbd.k { font: 400 12px var(--text); border: 1px solid var(--gold-line); padding:
   .progress { margin-left: 0; width: 100%; } .progress .bar { flex: 1; }
   .year h2 { font-size: 48px; }
   .groups { grid-template-columns: 1fr; }
-  .panel header, .panel .actions, .panel .statement, .panel .similar { padding-left: 16px; padding-right: 16px; }
+  .panel header, .panel .actions, .panel .similar { padding-left: 16px; padding-right: 16px; }
 }
 @media (min-width: 1100px) { body.panel-open .grid { column-count: 1; } body.panel-open .hero h1 { font-size: 52px; } body.panel-open .brand span, body.panel-open .brand small { display: none; } }

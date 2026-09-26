@@ -268,7 +268,6 @@
     $(".ptags", els.panel).innerHTML = `<span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}`;
     $("h2", els.panel).textContent = p.displayTitle;
     $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages}${p.source ? ` · fonte: ${esc(p.source)}` : ""}`;
-    $(".statement", els.panel).innerHTML = `<p>${esc(p.text || "(sem texto extraído — veja o PDF)")}${p.text && p.text.length >= 900 ? "…" : ""}</p><small>Texto extraído automaticamente do PDF; fórmulas e figuras só aparecem direito no PDF.</small>`;
     $("#openPdf", els.panel).href = pdfHref(p);
     $("#openPdf", els.panel).lastElementChild.textContent = ` Abrir PDF na p. ${p.page}`;
     const gab = $("#openGab", els.panel);

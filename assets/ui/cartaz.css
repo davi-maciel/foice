@@ -165,9 +165,6 @@ nav.views button[aria-pressed="true"] { background: var(--ink); color: var(--yel
 .panel .actions .btn { padding: 7px 14px; font-size: 13.5px; box-shadow: 2px 2px 0 var(--ink); }
 .panel .actions .solve { margin-left: 0; border: 2px solid var(--ink); border-radius: 999px; padding: 7px 14px; background: var(--white); }
 #posInfo { font-weight: 700; font-size: 13px; color: var(--ink-3); }
-.panel .statement { padding: 14px 18px; font-size: 15px; line-height: 1.55; border-bottom: 2px solid var(--ink); max-height: 32vh; overflow: auto; }
-.panel .statement p { margin: 0 0 8px; }
-.panel .statement small { color: var(--ink-3); font-size: 12px; font-weight: 500; }
 .panel .similar { padding: 12px 18px 14px; border-bottom: 2px solid var(--ink); max-height: 30vh; overflow: auto; background: var(--cream-2); }
 .panel .similar h3 { margin: 0 0 8px; font: 700 11px var(--text); text-transform: uppercase; letter-spacing: .08em; }
 .panel .similar h3 b { background: var(--ink); color: var(--white); padding: 1px 6px; }
@@ -190,7 +187,7 @@ footer a { color: var(--white); }
 kbd.k { font: 700 11px var(--text); border: 2px solid #d9d2c0; border-radius: 6px; padding: 2px 6px; color: var(--white); }
 .toast { background: var(--ink); color: var(--yellow); padding: 10px 16px; font-weight: 700; border: 2px solid var(--yellow); }
 
-@media (max-width: 1099px) { .panel .statement { max-height: none; flex: 1; } .panel .similar { max-height: 42vh; } }
+@media (max-width: 1099px) { .panel .similar { max-height: none; flex: 1; } }
 @media (max-width: 640px) {
   .wrap { padding: 0 16px; }
   .top .wrap { gap: 8px; min-height: 58px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
@@ -211,6 +208,6 @@ kbd.k { font: 700 11px var(--text); border: 2px solid #d9d2c0; border-radius: 6p
   .progress { margin-left: 0; width: 100%; } .progress .bar { flex: 1; }
   .reset { margin-left: 0; }
   .year h2 { font-size: 52px; }
-  .panel header, .panel .actions, .panel .statement, .panel .similar { padding-left: 14px; padding-right: 14px; }
+  .panel header, .panel .actions, .panel .similar { padding-left: 14px; padding-right: 14px; }
 }
 @media (min-width: 1100px) { body.panel-open .hero::before, body.panel-open .hero::after { display: none; } body.panel-open .hero h1 { font-size: 46px; } body.panel-open .brand span { display: none; } }

@@ -159,10 +159,6 @@ nav.views button[aria-pressed="true"] { color: var(--red); text-decoration: unde
 .panel .actions .btn { padding: 8px 12px; font-size: 11px; }
 .panel .actions .solve { margin-left: 0; border: 1px solid var(--rule-soft); padding: 8px 12px; }
 #posInfo { font: italic 14px var(--text); color: var(--ink-3); }
-.panel .statement { padding: 16px 22px; color: var(--ink-2); font-size: 16px; line-height: 1.55; border-bottom: 1px solid var(--rule-soft); max-height: 32vh; overflow: auto; }
-.panel .statement p { margin: 0 0 8px; }
-.panel .statement p::first-letter { font: 700 44px/0.8 var(--display); float: left; margin: 6px 8px 0 0; color: var(--red); }
-.panel .statement small { color: var(--ink-3); font: italic 12.5px var(--text); }
 .panel .similar { padding: 12px 22px 16px; border-bottom: 1px solid var(--rule-soft); max-height: 30vh; overflow: auto; }
 .panel .similar h3 { margin: 0 0 8px; font: 600 10.5px var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--red); }
 .panel .similar h3 b { color: var(--ink-2); }
@@ -207,9 +203,8 @@ kbd.k { font: 600 10px var(--ui); border: 1px solid var(--rule-soft); padding: 2
   .progress { margin-left: 0; width: 100%; }
   .progress .bar { flex: 1; }
   .year h2 { font-size: 48px; }
-  .panel header, .panel .actions, .panel .statement, .panel .similar { padding-left: 16px; padding-right: 16px; }
-  .panel .statement { max-height: none; flex: 1; }
-  .panel .similar { max-height: 42vh; }
+  .panel header, .panel .actions, .panel .similar { padding-left: 16px; padding-right: 16px; }
+  .panel .similar { max-height: none; flex: 1; }
 }
-@media (max-width: 1099px) { .panel .statement { max-height: none; flex: 1; } .panel .similar { max-height: 42vh; } }
+@media (max-width: 1099px) { .panel .similar { max-height: none; flex: 1; } }
 @media (min-width: 1100px) { body.panel-open .grid { column-count: 1; } body.panel-open .hero h1 { font-size: 52px; } body.panel-open .brand span { display: none; } }
