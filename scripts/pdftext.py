@@ -81,8 +81,19 @@ def page_lines(layout, gutter=18):
     # duas colunas de verdade: várias linhas à esquerda e várias à direita cujo início (x0) coincide;
     # equações centradas e fins de parágrafo curtos não se alinham assim.
     from collections import Counter
+    wide = 0.3 * (layout.x1 - layout.x0)          # linha de texto de verdade, não fragmento de fórmula
     right_starts = Counter(round(r["x0"] / 3) for r, k in zip(raw, kinds) if k == "right" and r["x0"] > mid - gutter)
-    two_col = kinds.count("left") >= 3 and bool(right_starts) and max(right_starts.values()) >= 3
+    # e as duas colunas precisam coexistir lado a lado: linhas à esquerda com uma linha à direita na mesma altura
+    rights = [r for r, k in zip(raw, kinds) if k == "right"]
+    side_by_side = sum(1 for r, k in zip(raw, kinds) if k == "left" and any(min(r["y1"], q["y1"]) - max(r["y0"], q["y0"]) > 2 for q in rights))
+    two_col = kinds.count("left") >= 3 and bool(right_starts) and max(right_starts.values()) >= 3 and side_by_side >= 3
+    # coluna esquerda justificada (muitas linhas terminando no mesmo x antes da calha) com algo à direita:
+    # também é página de duas colunas, mesmo com a coluna direita quase vazia (ex.: só o gabarito)
+    edges = Counter(round(r["x1"]) for r, k in zip(raw, kinds) if k == "left" and r["x1"] < mid + gutter and r["x1"] - r["x0"] >= wide)
+    if edges and not two_col:
+        edge, n_edge = edges.most_common(1)[0]
+        n_right = sum(1 for r, k in zip(raw, kinds) if k == "right" and r["x0"] > edge + 4)
+        if n_edge >= 5 and n_right >= 2: two_col = True
     # --- merge same-row fragments
     raw.sort(key=lambda r: -(r["y0"] + r["y1"]) / 2)
     rows = []

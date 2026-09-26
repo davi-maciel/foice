@@ -66,10 +66,37 @@ def page_objects(pdf, pi, pg):
         boxes.append((x0, y0, x1, y1))
     return boxes
 
+def next_column(cols, pi, kind):
+    """Coluna seguinte na ordem de leitura: direita da mesma página, senão a primeira da página seguinte."""
+    if kind == "left" and (pi, "right") in cols: return (pi, "right")
+    for k in ("left", "full"):
+        if (pi + 1, k) in cols: return (pi + 1, k)
+    return None
+
+def top_band(flat, pages, objs, cols, key, author):
+    """Objetos (figuras) acima da primeira linha de texto de uma coluna: um float empurrado para o topo."""
+    pi, kind = key; pg = pages[pi - 1]
+    rows = [r for p2, r in flat if p2 == pi and r["kind"] == kind and not is_chrome(r, pg, author)]
+    if not rows: return None
+    first_top = max(r["y1"] for r in rows)
+    cx0, cx1 = cols[key]
+    band = [b for b in objs[pi] if b[1] >= first_top - 2 and b[3] <= pg["top"] + 2 and cx0 - PAD <= (b[0] + b[2]) / 2 <= cx1 + PAD]
+    if not band: return None
+    return (pi, max(0, min(cx0, min(b[0] for b in band)) - PAD), min(b[1] for b in band) - PAD, min(pg["w"], max(cx1, max(b[2] for b in band)) + PAD), max(b[3] for b in band) + PAD)
+
+CLAIMED = set()
+AUDIT = False
+
 def crop_problem(pdf, pages, flat, cols, objs, start, end, author):
     """Retângulos [(página, x0, y0, x1, y1)] do problema cujas linhas são flat[start:end]."""
     rows = [(k, *flat[k]) for k in range(start, end) if not is_chrome(flat[k][1], pages[flat[k][0] - 1], author)]
     if not rows: return []
+    body = sorted(r["size"] for k, pi, r in rows[1:] if len(r["text"]) > 20) or [rows[0][2]["size"]]
+    body_size = body[len(body) // 2]
+    for i, (k, pi, r) in enumerate(rows[1:], 1):
+        t = r["text"].strip()
+        if B.END_RE.match(t) or re.match(r"^(refer[êe]ncias|bibliografia)\s*:?$", t, re.I) or (r["size"] >= 1.18 * body_size and len(t.split()) <= 7 and re.match(r"^\d{1,2}\s+[A-Za-zÀ-ÿ]", t)):
+            rows = rows[:i]; break   # título de seção ou gabarito: o problema acabou antes
     groups, cur = [], []
     for k, pi, r in rows:
         if cur and (pi, r["kind"]) != (cur[-1][1], cur[-1][2]["kind"]): groups.append(cur); cur = []
@@ -95,9 +122,26 @@ def crop_problem(pdf, pages, flat, cols, objs, start, end, author):
             if not (cx0 - PAD <= cx <= cx1 + PAD) or (ox1 - ox0) > 1.3 * colw: continue
             if oy1 <= low_lim or oy0 >= up_lim: continue
             if oy0 > top + 60 or oy1 < bottom - 60: continue      # longe demais do texto: é de outro problema
+            if oy0 >= top - 1 and above: continue                 # figura acima do título com texto de outro problema antes: é dele
+            if oy0 >= top - 1 and (pi, kind) in CLAIMED: continue # topo de coluna já reivindicado pelo problema anterior
             top = max(top, min(oy1, up_lim)); bottom = min(bottom, max(oy0, low_lim))
             cx0, cx1 = max(lim0, min(cx0, ox0)), min(lim1, max(cx1, ox1))
-        rects.append((pi, max(0, cx0 - PAD), max(0, bottom - PAD), min(pg["w"], cx1 + PAD), min(pg["h"], top + PAD)))
+        y_bottom = bottom - PAD if not below else max(bottom - PAD, low_lim + 1)   # não morde a linha seguinte
+        y_top = top + PAD if not above else min(top + PAD, up_lim - 1)
+        x_left, x_right = cx0 - PAD, cx1 + PAD
+        if kind in ("left", "right"):                                # não pega tinta da outra coluna na mesma faixa
+            other = "right" if kind == "left" else "left"
+            own_x0 = min(r["x0"] for k, p2, r in g); own_x1 = max(r["x1"] for k, p2, r in g)
+            nb = [r for p2, r in flat if p2 == pi and r["kind"] == other and r["y1"] > y_bottom + 1 and r["y0"] < y_top - 1]
+            if nb:
+                if kind == "left": x_right = max(min(x_right, min(r["x0"] for r in nb) - 1), own_x1)
+                else: x_left = min(max(x_left, max(r["x1"] for r in nb) + 1), own_x0)
+        rects.append((pi, max(0, x_left), max(0, y_bottom), min(pg["w"], x_right), min(pg["h"], y_top)))
+        if g is groups[-1] and not below:                        # o problema termina no pé da coluna:
+            nxt = next_column(cols, pi, kind)                    # uma figura no topo da coluna seguinte é dele
+            if nxt and nxt not in CLAIMED:
+                band = top_band(flat, pages, objs, cols, nxt, author)
+                if band: rects.append(band); CLAIMED.add(nxt)
     return rects
 
 _col_cache = {}
@@ -134,15 +178,29 @@ def process_list(lid, wanted, scale, debug, crops):
         for kind in ("left", "right", "full"):
             rs = [r for r in pg["rows"] if r["kind"] == kind and not is_chrome(r, pg, author)]
             if rs: cols[(pi, kind)] = (min(r["x0"] for r in rs), max(r["x1"] for r in rs))
-        if (pi, "left") in cols and (pi, "right") in cols:   # colunas: até o meio da calha
-            l0, l1 = cols[(pi, "left")]; r0, r1 = cols[(pi, "right")]; mid = (l1 + r0) / 2
-            cols[(pi, "left")] = (l0, mid - 2); cols[(pi, "right")] = (mid + 2, r1)
-    _col_cache.clear()
+        if (pi, "left") in cols and (pi, "right") in cols:   # colunas: até o meio da calha (percentis, robusto a uma linha larga)
+            lx1 = sorted(r["x1"] for r in pg["rows"] if r["kind"] == "left" and not is_chrome(r, pg, author))
+            rx0 = sorted(r["x0"] for r in pg["rows"] if r["kind"] == "right" and not is_chrome(r, pg, author))
+            l1 = lx1[int(0.85 * (len(lx1) - 1))]; r0 = rx0[int(0.15 * (len(rx0) - 1))]
+            mid = (l1 + r0) / 2 if l1 < r0 else pg["w"] / 2
+            cols[(pi, "left")] = (cols[(pi, "left")][0], mid - 2); cols[(pi, "right")] = (mid + 2, cols[(pi, "right")][1])
+    _col_cache.clear(); CLAIMED.clear()
     for p in probs:
         pid = f"{lid}-{p['n']}"
         if wanted and pid not in wanted: continue
         rects = crop_problem(pdf, pages, flat, cols, objs, p["_row"], p["_row_end"], author)
         if not rects: print(f"!! {pid}: sem linhas"); continue
+        if AUDIT:
+            def inside(pi_, r_):
+                return any(pi_ == a and r_["x0"] >= x0 - 1 and r_["x1"] <= x1 + 1 and r_["y0"] >= y0 - 1 and r_["y1"] <= y1 + 1 for a, x0, y0, x1, y1 in rects)
+            def touches(pi_, r_):
+                return any(pi_ == a and min(r_["x1"], x1) - max(r_["x0"], x0) > 3 and min(r_["y1"], y1) - max(r_["y0"], y0) > 3 for a, x0, y0, x1, y1 in rects)
+            own = [(pi_, r_) for pi_, r_ in flat[p["_row"]:p["_row_end"]] if not is_chrome(r_, pages[pi_ - 1], author)]
+            missing = [r_["text"][:30] for pi_, r_ in own if not inside(pi_, r_)]
+            others = [(pi_, r_) for k, (pi_, r_) in enumerate(flat) if not (p["_row"] <= k < p["_row_end"]) and not is_chrome(r_, pages[pi_ - 1], author)]
+            leaks = [r_["text"][:30] for pi_, r_ in others if touches(pi_, r_)]
+            if missing or leaks: print(f"?? {pid}: faltam {len(missing)} {missing[:3]} | vazam {len(leaks)} {leaks[:3]}")
+            continue
         img = render_rects(pdf, rects, scale)
         img = img.quantize(colors=128, method=Image.Quantize.FASTOCTREE)
         img.save(os.path.join(OUT, f"{pid}.png"), optimize=True)
@@ -159,6 +217,7 @@ if __name__ == "__main__":
     args = [a for a in argv if not a.startswith("--")]
     scale = float(sys.argv[sys.argv.index("--scale") + 1]) if "--scale" in sys.argv else 2.2
     debug = "--debug" in sys.argv
+    AUDIT = "--audit" in sys.argv
     cj = os.path.join(ROOT, "data", "crops.js")
     crops = json.loads(open(cj).read()[len("window.FOICE_CROPS = "):].rstrip().rstrip(";")) if os.path.exists(cj) else {}
     by_list = {}

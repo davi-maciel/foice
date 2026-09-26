@@ -53,7 +53,7 @@ Os limiares atuais foram ajustados lendo esse relatório par a par. Duas coisas 
 
 ## Recortes dos problemas
 
-`python3 scripts/crop_problems.py [ids ou listas]` (precisa de `pip install pypdfium2 pillow`) localiza cada problema pelas posições dos títulos no layout, junta os trechos de cada coluna/página numa imagem só, inclui figuras da faixa e exclui cabeçalhos, rodapés e notas. Sem argumentos, recorta tudo. Regenerar depois de mexer no parser (`build_index.py`), porque os índices vêm dele.
+`python3 scripts/crop_problems.py [ids ou listas]` (precisa de `pip install pypdfium2 pillow`) localiza cada problema pelas posições dos títulos no layout, junta os trechos de cada coluna/página numa imagem só, inclui as figuras da faixa (inclusive as que o LaTeX empurrou para o topo da coluna seguinte) e exclui cabeçalhos, rodapés, notas, títulos de seção e o gabarito. Sem argumentos, recorta os 668 problemas (~18 MB em `data/crops/`). `--audit` confere, sem gravar, se alguma linha do problema ficou de fora ou se alguma linha de outro problema entrou; `--debug` imprime os retângulos. Regenerar depois de mexer no parser (`build_index.py`), porque os índices vêm dele.
 
 ## Design
 
