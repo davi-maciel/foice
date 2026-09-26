@@ -13,6 +13,8 @@ Site estático (sem build no deploy), hospedado na Vercel em https://ipho.com.br
 - `data/overrides.json` — correções manuais de tema ou título, por id de problema (`<ano>-<autor>-<lista>-<n>`).
 - `data/similar_overrides.json` — pares que o cálculo de semelhança acha parecidos mas que não são o mesmo problema.
 - `scripts/build_index.py` e `scripts/pdftext.py` — extraem o texto dos PDFs e geram `data/problems.js`.
+- `problemas/<lista>/<n>.tex` — transcrições em LaTeX dos enunciados (piloto), com `problemas/preamble.tex`, as figuras recortadas dos PDFs em `problemas/<lista>/fig/` e os metadados de recorte em `problemas/figuras.json` e `problemas/recortes.json`.
+- `scripts/build_tex.py` — compila cada transcrição (Tectonic) e a compara com o PDF original: similaridade do texto extraído, lista de palavras que diferem e uma imagem lado a lado em `build/tex/<id>-cmp.png`.
 
 ## Adicionar uma lista
 
@@ -51,3 +53,15 @@ Os limiares atuais foram ajustados lendo esse relatório par a par. Duas coisas 
 ## Design
 
 Grade internacional: Archivo, preto e branco com um vermelho só para estado, filetes de 1px formando a tabela, números grandes marcando o ritmo. Inspirações: Grilli Type, Klim e os sites tipográficos do Siteinspire. As cores são estruturais e nunca identificam temas.
+
+## Transcrições em LaTeX
+
+Os PDFs foram feitos em LaTeX, mas os fontes não estão no repositório; `problemas/` recria os enunciados um a um. Cada arquivo `problemas/<lista>/<n>.tex` contém só o corpo do enunciado, começa com um comentário `% id: ... | fonte: ...` e mantém o texto do original (erros de digitação ficam marcados com `% sic`). Para conferir:
+
+```
+brew install tectonic && pip install pypdfium2 pillow
+python3 scripts/build_tex.py                 # todos
+python3 scripts/build_tex.py 2020-maciel-3-1 # um só
+```
+
+O script imprime a similaridade do texto (as diferenças normais são hifenização e legendas) e grava `build/tex/<id>-cmp.png` com o recorte do PDF à esquerda e a transcrição à direita. Figuras entram como recortes do próprio PDF, definidos em `problemas/figuras.json`.

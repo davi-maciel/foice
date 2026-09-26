@@ -1,0 +1,5 @@
+{
+  "_comment": "Recortes das figuras nos PDFs originais: id -> {page, box em frações da página [x0, y0, x1, y1]}. scripts/build_tex.py gera problemas/<lista>/fig/<n>.png.",
+  "2020-maciel-3-1": {"page": 1, "box": [0.345, 0.165, 0.485, 0.262]},
+  "2024-tavares-1-1": {"page": 1, "box": [0.19, 0.30, 0.40, 0.455]}
+}
