@@ -388,7 +388,14 @@
     const toTop = $("#toTop");
     const onScroll = () => { toTop.hidden = window.scrollY < 600; };
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
-    toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+    toTop.addEventListener("click", () => {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { window.scrollTo(0, 0); return; }
+      const y0 = window.scrollY, t0 = performance.now(), dur = Math.min(600, 250 + y0 / 12);
+      let started = false;
+      const step = (t) => { started = true; const k = Math.min(1, (t - t0) / dur); window.scrollTo(0, Math.round(y0 * Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+      setTimeout(() => { if (!started) window.scrollTo(0, 0); }, 200);   // sem quadros de animação (aba em segundo plano), pula direto
+    });
     window.addEventListener("hashchange", () => { const before = JSON.stringify(state); readHash(); if (JSON.stringify(state) !== before) { els.q.value = state.q; render(); if (state.open) openDetail(state.open); else closeDetail(); } });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
