@@ -300,3 +300,20 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
 @media (min-width: 1100px) { body.panel-open .grid { grid-template-columns: 1fr; } body.panel-open .card { min-height: 0; } body.panel-open .resultbar .count b { font-size: 40px; } }
 .panel .pmeta .versions { margin-left: 0; }
 .panel .pmeta .stars { letter-spacing: 0; }
+
+/* ---- filtros no celular: gaveta ---- */
+.ftoggle, .fscrim, .fhead, .ffoot { display: none; }
+@media (max-width: 640px) {
+  .ftoggle { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; border-bottom: 1px solid var(--black); background: var(--white); padding: 12px 16px; font: 500 14px var(--sans); color: var(--black); cursor: pointer; text-align: left; }
+  .ftoggle::after { content: ""; margin-left: auto; width: 6px; height: 6px; border-right: 1px solid var(--black); border-bottom: 1px solid var(--black); transform: rotate(-45deg); }
+  .ftcount:not(:empty) { background: var(--red); color: var(--white); font-weight: 500; font-size: 11px; min-width: 18px; height: 18px; padding: 0 5px; display: inline-grid; place-items: center; border-radius: 9px; }
+  .filters { position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; max-height: 85vh; overflow: auto; background: var(--white); border-top: 1px solid var(--black); transform: translateY(100%); transition: transform .22s ease; visibility: hidden; }
+  .filters.open { transform: none; visibility: visible; }
+  .fhead { display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 16px; border-bottom: 1px solid var(--black); font-weight: 700; font-size: 18px; position: sticky; top: 0; background: var(--white); z-index: 1; }
+  .fhead .iconbtn { border: 0; border-left: 1px solid var(--black); width: 52px; height: 52px; }
+  .ffoot { display: block; position: sticky; bottom: 0; background: var(--white); border-top: 1px solid var(--black); }
+  .ffoot .btn { width: 100%; justify-content: center; padding: 14px; border: 0; }
+  .fscrim { position: fixed; inset: 0; z-index: 44; background: rgba(0,0,0,.35); }
+  body.filters-open .fscrim { display: block; }
+  body.filters-open { overflow: hidden; }
+}

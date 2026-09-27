@@ -185,6 +185,7 @@
       topics.map((t) => `<button class="chip" aria-pressed="${ts.has(t.id)}" data-topic="${t.id}">${esc(t.label)} <b>${counts[t.id] || 0}</b></button>`).join("");
   }
   function renderSubfilters() {
+    renderFilterToggle();
     renderMsel(els.year, "year", years.map((y) => ({ v: String(y), label: String(y) })), "Todos os anos", (n) => `${n} anos`);
     renderMsel(els.author, "author", authorsSorted.map((a) => ({ v: a.id, label: a.name, n: a.n })), "Todos os autores", (n) => `${n} autores`);
     renderMsel(els.diff, "diff", [{ v: "1", label: "★ fácil" }, { v: "2", label: "★★ médio" }, { v: "3", label: "★★★ difícil" }, { v: "0", label: "sem indicação" }], "Qualquer dificuldade", (n) => `${n} dificuldades`);
@@ -199,6 +200,18 @@
     els.listTag.hidden = !state.list;
     if (state.list && lists[state.list]) els.listTag.innerHTML = `Lista: <b>${esc(lists[state.list].authorName)} — ${esc(lists[state.list].label)} (${lists[state.list].year})</b> <button class="x" title="remover filtro">✕</button>`;
   }
+  // ---- filtros no celular: botão "Filtros" abre uma gaveta de baixo para cima
+  function renderFilterToggle() {
+    const n = ["year", "author", "diff", "topic"].reduce((a, k) => a + sel(k).size, 0) + (state.list ? 1 : 0) + (state.hideSolved ? 1 : 0);
+    $(".ftcount").textContent = n ? String(n) : "";
+    const total = current.length || D.problems.length;
+    $("#fApply").textContent = `Ver ${total} ${total === 1 ? "problema" : "problemas"}`;
+  }
+  function setFiltersOpen(open) {
+    const f = $("#filters"); f.classList.toggle("open", open);
+    $("#fToggle").setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("filters-open", open);
+  }
   function renderMsel(el, key, opts, allLabel, manyLabel) {
     const chosen = sel(key);
     const one = opts.find((o) => chosen.has(o.v));
@@ -212,6 +225,7 @@
   function renderGrid() {
     const toks = tokens();
     current = filtered();
+    if ($("#fApply")) renderFilterToggle();
     const n = current.length;
     const what = state.q ? `para <b>“${esc(state.q)}”</b>` : "";
     els.count.innerHTML = `<b>${n}</b> ${n === 1 ? "problema" : "problemas"} ${what}`;
@@ -417,6 +431,7 @@
     $("#panelRandom").addEventListener("click", random);
     document.addEventListener("keydown", (e) => {
       const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName);
+      if (e.key === "Escape" && $("#filters").classList.contains("open")) { setFiltersOpen(false); return; }
       if (e.key === "Escape" && [els.year, els.author, els.diff].some((o) => o.open)) { [els.year, els.author, els.diff].forEach((o) => { o.open = false; }); return; }
       if (e.key === "Escape") { if (state.open) closeDetail(); else if (typing) document.activeElement.blur(); return; }
       if (typing) return;
@@ -425,6 +440,8 @@
       else if (state.open && (e.key === "ArrowRight" || e.key === "j")) nav(1);
       else if (state.open && (e.key === "ArrowLeft" || e.key === "k")) nav(-1);
     });
+    $("#fToggle").addEventListener("click", () => setFiltersOpen(!$("#filters").classList.contains("open")));
+    ["#fClose", "#fScrim", "#fApply"].forEach((q) => $(q).addEventListener("click", () => setFiltersOpen(false)));
     const toTop = $("#toTop");
     const onScroll = () => { toTop.hidden = window.scrollY < 600; };
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
