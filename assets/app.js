@@ -342,11 +342,24 @@
     if (j >= state.shown) { state.shown = j + 24; renderGrid(); }
     openDetail(current[j].id, { scroll: true });
   }
-  function random() {
-    let pool = current.filter((p) => !isSolved(p.id)); if (!pool.length) pool = current; if (!pool.length) return toast("Nenhum problema com esses filtros.");
-    const p = pool[Math.floor(Math.random() * pool.length)];
-    const j = current.indexOf(p); if (j >= state.shown) { state.shown = j + 24; renderGrid(); }
-    openDetail(p.id, { scroll: true });
+  // "Sortear" embaralha a lista inteira (ordem aleatória) e abre o primeiro problema não resolvido;
+  // a partir daí "próximo"/"anterior" e "Sortear outro" andam por essa ordem embaralhada.
+  function random({ reshuffle = false } = {}) {
+    if (state.sort !== "aleatorio" || reshuffle || !state.open) {
+      state.sort = "aleatorio"; seed = Math.floor(Math.random() * 100000); state.shown = 72; render();
+      if (!current.length) return toast("Nenhum problema com esses filtros.");
+      const first = current.find((p) => !isSolved(p.id)) || current[0];
+      window.scrollTo({ top: 0 });
+      return openDetail(first.id, { scroll: true });
+    }
+    const i = current.findIndex((x) => x.id === state.open);
+    for (let k = 1; k <= current.length; k++) {
+      const q = current[(i + k) % current.length];
+      if (!isSolved(q.id) || k === current.length) {
+        const j = current.indexOf(q); if (j >= state.shown) { state.shown = j + 24; renderGrid(); }
+        return openDetail(q.id, { scroll: true });
+      }
+    }
   }
   let toastT; function toast(msg) { els.toast.textContent = msg; els.toast.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => els.toast.classList.remove("show"), 2200); }
 
@@ -383,7 +396,7 @@
     els.reset.addEventListener("click", resetAll);
     els.listTag.addEventListener("click", (e) => { if (e.target.closest(".x")) { state.list = ""; render(); } });
     $$("nav.views button").forEach((b) => b.addEventListener("click", () => { state.view = b.dataset.view; render(); window.scrollTo({ top: 0 }); }));
-    $("#randomBtn").addEventListener("click", random);
+    $("#randomBtn").addEventListener("click", () => random({ reshuffle: true }));
     els.grid.addEventListener("click", (e) => {
       if (e.target.closest("#moreBtn")) { state.shown += 72; renderGrid(); return; }
       if (e.target.closest("#emptyReset")) { resetAll(); return; }
