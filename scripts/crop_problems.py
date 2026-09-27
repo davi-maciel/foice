@@ -136,7 +136,9 @@ def crop_problem(pdf, pages, flat, cols, objs, start, end, author):
             if nb:
                 if kind == "left": x_right = max(min(x_right, min(r["x0"] for r in nb) - 1), own_x1)
                 else: x_left = min(max(x_left, max(r["x1"] for r in nb) + 1), own_x0)
-        rects.append((pi, max(0, x_left), max(0, y_bottom), min(pg["w"], x_right), min(pg["h"], y_top)))
+        xs = sorted(r["x0"] for k, r in col_rows)
+        margin = xs[int(0.05 * (len(xs) - 1))] if xs else x_left + PAD      # margem de texto da coluna
+        rects.append((pi, max(0, x_left), max(0, y_bottom), min(pg["w"], x_right), min(pg["h"], y_top), margin))
         if g is groups[-1] and not below:                        # o problema termina no pé da coluna:
             nxt = next_column(cols, pi, kind)                    # uma figura no topo da coluna seguinte é dele
             if nxt and nxt not in CLAIMED:
@@ -151,17 +153,40 @@ def flat_rows_of(flat, pi, kind, pages, author):
         _col_cache[key] = [(k, p2, r) for k, (p2, r) in enumerate(flat) if p2 == pi and r["kind"] == kind and not is_chrome(r, pages[pi - 1], author)]
     return _col_cache[key]
 
+def _ink_bbox(img, thresh=235):
+    """Caixa da tinta (pixels mais escuros que `thresh`); None se a peça está em branco."""
+    g = img.convert("L").point(lambda v: 255 if v < thresh else 0)
+    return g.getbbox()
+
 def render_rects(pdf, rects, scale):
+    """Renderiza os retângulos e os empilha como um bloco só. Peças de texto são alinhadas pela
+    margem de texto da sua coluna (a continuação na coluna seguinte lê como a próxima linha, e
+    recuos como o de um item são preservados); peças estreitas (figuras) ficam centralizadas;
+    o branco acima e abaixo de cada peça é aparado."""
     pieces = []
-    for pi, x0, y0, x1, y1 in rects:
+    for r in rects:
+        pi, x0, y0, x1, y1 = r[:5]
+        margin = r[5] if len(r) > 5 else None
         page = pdf[pi - 1]; w, h = page.get_size()
         img = page.render(scale=scale, crop=(x0, y0, w - x1, h - y1)).to_pil().convert("RGB")
-        pieces.append(img)
-    W = max(p.width for p in pieces); gap = int(6 * scale)
-    H = sum(p.height for p in pieces) + gap * (len(pieces) - 1)
-    out = Image.new("RGB", (W, H), (255, 255, 255)); y = 0
-    for p in pieces:
-        out.paste(p, ((W - p.width) // 2, y)); y += p.height + gap
+        bb = _ink_bbox(img)
+        if not bb: continue
+        img = img.crop((0, bb[1], img.width, bb[3]))                       # só apara em cima e embaixo
+        left = int((margin - x0) * scale) if margin is not None else bb[0]  # onde começa o texto na peça
+        pieces.append((img, max(0, left), bb[0], bb[2]))
+    if not pieces: return Image.new("RGB", (10, 10), (255, 255, 255))
+    pad = int(PAD * 1.5 * scale); gap = int(5 * scale)
+    # largura útil: da margem de texto até a tinta mais à direita
+    W = max(ink_r - left for img, left, ink_l, ink_r in pieces)
+    H = sum(img.height for img, *_ in pieces) + gap * (len(pieces) - 1)
+    out = Image.new("RGB", (W + 2 * pad, H + 2 * pad), (255, 255, 255)); y = pad
+    for img, left, ink_l, ink_r in pieces:
+        if ink_r - ink_l < 0.75 * W:                                          # figura: centraliza a tinta
+            out.paste(img.crop((ink_l, 0, ink_r, img.height)), (pad + (W - (ink_r - ink_l)) // 2, y))
+        else:
+            src_l = min(left, ink_l)                                          # tinta pendurada à esquerda da margem (ex.: "b)")
+            out.paste(img.crop((src_l, 0, ink_r, img.height)), (pad - (left - src_l), y))
+        y += img.height + gap
     return out
 
 def process_list(lid, wanted, scale, debug, crops):
