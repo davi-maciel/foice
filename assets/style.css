@@ -217,8 +217,10 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .iconbtn { border: 0; border-left: 1px solid var(--black); background: var(--white); width: 56px; align-self: stretch; display: inline-grid; place-items: center; color: var(--black); flex: none; }
 .iconbtn:hover { background: var(--gray-1); }
 .iconbtn:disabled { color: var(--gray-2); cursor: default; }
-.panel .actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; border-bottom: 1px solid var(--black); }
-.panel .actions > * { min-width: 0; border: 0; border-right: 1px solid var(--black); border-bottom: 1px solid var(--gray-2); margin: 0; padding: 11px 8px; font-size: 12.5px; justify-content: center; }
+/* linhas da barra: fundo preto aparecendo pelo gap de 1px, então todas têm a mesma espessura e nunca somam */
+.panel .actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; gap: 1px; background: var(--black); border-bottom: 1px solid var(--black); }
+.panel .actions > * { min-width: 0; border: 0 !important; margin: 0; padding: 11px 8px; font-size: 12.5px; justify-content: center; background: var(--white); }
+.panel .actions > .btn.primary { background: var(--black); }
 .panel .actions .btn { grid-column: span 3; }
 .panel.no-gab .actions .btn.primary { grid-column: span 6; border-right: 0; }
 .panel .actions #openGab { border-right: 0; }
