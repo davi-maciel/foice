@@ -8,7 +8,7 @@ Site estático (sem build no deploy), hospedado na Vercel em https://ipho.com.br
 
 - `index.html`, `assets/style.css`, `assets/app.js` — o site: busca instantânea, filtros por tema/ano/autor/dificuldade, leitor que abre o PDF na página do problema, sorteio de problema e progresso ("resolvido") salvo no navegador. A visão "Listas" mantém a organização original por ano e autor.
 - `listas/<ano>/<Autor>/lista<ano><autor><n>.pdf` — os PDFs originais. O ano indica para qual edição da IPhO os alunos se preparavam.
-- `data/catalog.json` — catálogo das listas: ano, autor, arquivo, rótulo e, opcionalmente, `hint` com o tema predominante da lista.
+- `data/catalog.json` — catálogo das listas: ano, autor, arquivo, rótulo e, opcionalmente, `hint` com o tema predominante da lista e `sections` (linha-marcador → prefixo de rótulo) para listas cuja numeração recomeça numa seção, como os "Desafios" da lista do Evers.
 - `data/problems.js` — índice gerado: um registro por problema (título, página, tema, dificuldade quando o autor marcou, trecho do enunciado, problemas parecidos).
 - `data/overrides.json` — correções manuais de tema ou título, por id de problema (`<ano>-<autor>-<lista>-<n>`).
 - `data/similar_overrides.json` — pares que o cálculo de semelhança acha parecidos mas que não são o mesmo problema.

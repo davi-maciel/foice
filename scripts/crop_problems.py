@@ -168,7 +168,7 @@ def process_list(lid, wanted, scale, debug, crops):
     l = LISTS[lid]; path = os.path.join(ROOT, l["file"]); author = CATALOG[l["file"]]["author"]
     pages = extract_rows(path)
     texts = [[r["text"] for r in pg["rows"]] for pg in pages]
-    probs, _, _ = B.parse_list(texts)
+    probs, _, _ = B.parse_list(texts, CATALOG[l["file"]].get("sections"))
     flat = [(pi, r) for pi, pg in enumerate(pages, 1) for r in pg["rows"] if r["text"].strip()]
     pdf = pdfium.PdfDocument(path)
     for pi, pg in enumerate(pages, 1): pg["top"], pg["bottom"] = content_zone(pdf, pi, pg)

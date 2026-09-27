@@ -8,6 +8,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const STAR = "★";
+  const labelText = (p) => /^\d/.test(p.label) ? `problema ${p.label}` : p.label;
 
   if (!D) { document.body.innerHTML = '<p style="padding:40px;font-family:sans-serif">Não foi possível carregar <code>data/problems.js</code>.</p>'; return; }
 
@@ -149,7 +150,7 @@
   const pdfHref = (p, page) => `${p.L.file}#page=${page || p.page}`;
   function cardHtml(p, toks) {
     const title = p.title ? highlight(p.title, toks) : `<span class="num">Problema ${esc(p.label)}</span>`;
-    const probNo = p.title ? ` · problema ${esc(p.label)}` : "";
+    const probNo = p.title ? ` · ${esc(labelText(p))}` : "";
     return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
       <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}</div>
       <h3 class="title">${title}</h3>
@@ -243,7 +244,7 @@
     els.groups.innerHTML = groups.map((g) => `<article class="grp${state.group === g.id ? " focus" : ""}" id="grp-${esc(g.id)}">
       <header><h3>${esc(g.title)}</h3><span class="gmeta">${esc(topicLabel[g.topic])} · ${g.members.length} versões · ${g.years.join(", ")}</span></header>
       <div class="lists">${g.members.map((m) => `<div class="lrow${isSolved(m.id) ? " solved" : ""}" data-id="${m.id}"><button class="lmain" data-open="${m.id}" title="Abrir este problema">
-        <span class="lname">${esc(m.displayTitle)}</span><span class="lmeta">${esc(m.authorName)} · ${esc(m.L.label)} · ${m.year}${m.title ? ` · problema ${esc(m.label)}` : ""}</span></button>
+        <span class="lname">${esc(m.displayTitle)}</span><span class="lmeta">${esc(m.authorName)} · ${esc(m.L.label)} · ${m.year}${m.title ? ` · ${esc(labelText(m))}` : ""}</span></button>
         <a class="lpdf" href="${pdfHref(m)}" target="_blank" rel="noopener" title="Abrir o PDF na página ${m.page}">PDF ↗</a></div>`).join("")}</div></article>`).join("");
     if (state.group) { const el = $(`#grp-${state.group}`); if (el) requestAnimationFrame(() => el.scrollIntoView({ block: "start", behavior: "smooth" })); }
   }
@@ -270,7 +271,7 @@
     }
     const i = current.findIndex((x) => x.id === id);
     $("h2", els.panel).textContent = p.displayTitle;
-    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}<span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
+    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `${esc(labelText(p))} · ` : ""}<span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
     $("#openPdf", els.panel).href = pdfHref(p);
     $("#openPdf", els.panel).lastElementChild.textContent = " Abrir PDF";
     const gab = $("#openGab", els.panel);
@@ -308,7 +309,7 @@
     els.similar.innerHTML = `<h3>Problemas parecidos <b>${near.length}</b></h3>
       <ul>${near.map(({ q, score }) => `<li><button class="simrow" data-open="${esc(q.id)}" title="Abrir este problema">
         <span class="simtitle">${esc(q.displayTitle)}</span>
-        <span class="simmeta">${esc(q.authorName)} · ${esc(q.L.label)} · ${q.year}${q.title ? ` · problema ${esc(q.label)}` : ""}</span>
+        <span class="simmeta">${esc(q.authorName)} · ${esc(q.L.label)} · ${q.year}${q.title ? ` · ${esc(labelText(q))}` : ""}</span>
         <span class="simtag">${simLabel(score)}</span></button></li>`).join("")}</ul>
       <small>Comparação automática dos enunciados: o mesmo problema costuma voltar em outro ano, às vezes com outro título.</small>`;
   }

@@ -48,7 +48,7 @@ def original_text(pid):
     p = PROBLEMS[pid]; l = LISTS[p["list"]]
     if l["file"] not in _full_cache:
         pages = extract(os.path.join(ROOT, l["file"]))
-        probs, _, _ = B.parse_list(pages)
+        probs, _, _ = B.parse_list(pages, CATALOG[l["file"]].get("sections"))
         _full_cache[l["file"]] = {q["n"]: B.join_body(q["_body"], CATALOG[l["file"]]["author"])[0] for q in probs}
     return _full_cache[l["file"]].get(p["n"], "")
 

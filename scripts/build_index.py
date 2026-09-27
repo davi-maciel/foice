@@ -131,20 +131,26 @@ def chain_score(style, lines):
             if style != "sub": exp = c[0] + 1
     return n, (first if first is not None else 10**9)
 
-def parse_list(pages):
-    """pages: list of list of lines. Returns (problems, gabarito_page, style)."""
+def parse_list(pages, sections=None):
+    """pages: list of list of lines. Returns (problems, gabarito_page, style).
+    sections: {"Desafios:": "Desafio "} — a linha-marcador reinicia a numeração e prefixa os rótulos."""
+    sections = sections or {}
     lines = [(pi, ln) for pi, page in enumerate(pages, 1) for ln in page if ln.strip()]
     scores = {st: chain_score(st, lines) for st in PRIORITY}
     style = min(PRIORITY, key=lambda st: (-scores[st][0], scores[st][1], PRIORITY.index(st)))
     if scores[style][0] == 0:
         return [], None, None
-    problems, exp, gab_page, gab_row = [], 1, None, None
+    problems, exp, gab_page, gab_row, prefix = [], 1, None, None, ""
     i = 0
     while i < len(lines):
         pi, line = lines[i]
         s = line.strip()
         if END_RE.match(s) and len(problems) >= 2:
             gab_page, gab_row = pi, i; break
+        if s in sections:                      # nova seção: numeração recomeça, marcador fica fora dos problemas
+            exp, prefix = 1, sections[s]
+            if problems: problems[-1]["_end_override"] = i
+            i += 1; continue
         c = candidates(style, s)
         ok = c is not None and accept(style, c, exp)[0]
         if not ok:
@@ -178,7 +184,7 @@ def parse_list(pages):
                 if len(nxt) <= 40 and is_caps(title) and is_caps(nxt):
                     title += " " + nxt; j += 1; continue
                 break
-        label = f"{num[0]}.{num[1]}" if style == "sub" else str(num)
+        label = f"{num[0]}.{num[1]}" if style == "sub" else f"{prefix}{num}"
         stars = None
         if title is not None:
             title, stars = clean_title(title)
@@ -189,7 +195,7 @@ def parse_list(pages):
                          "page": pi, "kind": kind, "_body": ([(pi, body_first)] if body_first else []),
                          "_row": i, "_row_end": None})
         i = j
-    for a, b in zip(problems, problems[1:]): a["_row_end"] = b["_row"]
+    for a, b in zip(problems, problems[1:]): a["_row_end"] = a.pop("_end_override", b["_row"])
     if problems: problems[-1]["_row_end"] = gab_row if gab_row is not None else len(lines)
     problems = [p for p in problems if p["kind"] == "problem"]
     for k, p in enumerate(problems, 1): p["n"] = k
@@ -496,7 +502,7 @@ def main():
         suffix = re.sub(r"^lista\d{4}[a-z]+", "", base) or "1"
         lid = f"{entry['year']}-{folder.lower()}-{suffix}"
         pages = extract(os.path.join(ROOT, path))
-        probs, gab, style = parse_list(pages)
+        probs, gab, style = parse_list(pages, entry.get("sections"))
         head = " ".join(pages[0][:8]) if pages else ""
         headn = strip_accents(head.lower())
         date = None

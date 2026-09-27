@@ -340,7 +340,10 @@
   "author": "João Victor Evers",
   "file": "listas/2025/Evers/lista2025evers1.pdf",
   "label": "Lista 1",
-  "hint": "eletro"
+  "hint": "eletro",
+  "sections": {
+   "Desafios:": "Desafio "
+  }
  },
  {
   "year": 2025,
