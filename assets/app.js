@@ -335,8 +335,6 @@
     Object.assign(els, { problemas: $("#viewProblemas"), listas: $("#viewListas"), chips: $("#chips"), year: $("#fYear"), author: $("#fAuthor"), diff: $("#fDiff"), sort: $("#fSort"), hide: $("#fHide"), reset: $("#resetBtn"), listTag: $("#listTag"), count: $("#count"), grid: $("#grid"), progress: $("#progress"), years: $("#years"), panel: $("#panel"), scrim: $("#scrim"), toast: $("#toast"), q: $("#q"), similar: $("#similar"), repetidos: $("#viewRepetidos"), groups: $("#groups") });
     readHash();
     els.q.value = state.q; $(".search").classList.toggle("has-q", !!state.q);
-    $("#statTotal").textContent = D.problems.length; $("#statLists").textContent = D.lists.length; $("#statAuthors").textContent = Object.keys(D.authors).length;
-    $("#statYears").textContent = `${Math.min(...years)}–${Math.max(...years)}`;
     render();
     if (state.open) openDetail(state.open, { scroll: true });
 
