@@ -442,6 +442,48 @@
     });
     $("#fToggle").addEventListener("click", () => setFiltersOpen(!$("#filters").classList.contains("open")));
     ["#fClose", "#fScrim", "#fApply"].forEach((q) => $(q).addEventListener("click", () => setFiltersOpen(false)));
+    // ---- deslizar no painel (celular): esquerda = próximo, direita = anterior
+    (() => {
+      const body = $(".pbody", els.panel);
+      let x0 = 0, y0 = 0, t0 = 0, dx = 0, tracking = false, horizontal = null;
+      const zoomed = () => window.visualViewport && window.visualViewport.scale > 1.05;   // com zoom, o gesto é para mover a página
+      body.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 1 || zoomed()) { tracking = false; return; }
+        tracking = true; horizontal = null; dx = 0;
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+        body.style.transition = "none";
+      }, { passive: true });
+      body.addEventListener("touchmove", (e) => {
+        if (!tracking) return;
+        const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+        if (horizontal === null && (Math.abs(mx) > 10 || Math.abs(my) > 10)) horizontal = Math.abs(mx) > Math.abs(my) * 1.3;
+        if (!horizontal) return;
+        dx = mx;
+        const i = current.findIndex((q) => q.id === state.open);
+        const edge = (dx > 0 && i <= 0) || (dx < 0 && i >= current.length - 1);   // no começo/fim: resiste
+        body.style.transform = `translateX(${dx * (edge ? 0.15 : 0.45)}px)`;
+        body.style.opacity = String(1 - Math.min(Math.abs(dx) / 900, 0.25));
+      }, { passive: true });
+      const end = () => {
+        if (!tracking) return; tracking = false;
+        body.style.transition = "transform .18s ease, opacity .18s ease";
+        const fast = Date.now() - t0 < 700;
+        if (horizontal && Math.abs(dx) > 60 && fast) {
+          const dir = dx < 0 ? 1 : -1, before = state.open;
+          nav(dir);
+          if (state.open !== before) {
+            body.style.transition = "none";
+            body.style.transform = `translateX(${dir * 40}px)`; body.style.opacity = "0";
+            const settle = () => { body.style.transition = "transform .2s ease, opacity .2s ease"; body.style.transform = ""; body.style.opacity = ""; };
+            requestAnimationFrame(() => requestAnimationFrame(settle));
+            setTimeout(settle, 250);   // garantia caso não haja quadros de animação
+            return;
+          }
+        }
+        body.style.transform = ""; body.style.opacity = "";
+      };
+      body.addEventListener("touchend", end); body.addEventListener("touchcancel", end);
+    })();
     const toTop = $("#toTop");
     const onScroll = () => { toTop.hidden = window.scrollY < 600; };
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
