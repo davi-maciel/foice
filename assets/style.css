@@ -70,9 +70,9 @@ button { cursor: pointer; border-radius: 0; }
 .top { background: var(--white); border-bottom: 1px solid var(--black); }
 .top .wrap { display: flex; align-items: stretch; gap: 0; min-height: 56px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; padding-right: 24px; border-right: 1px solid var(--black); }
-.brand img { display: none; }
+.brand img { display: block; height: 40px; width: auto; }
 .brand span { font-weight: 700; font-size: 15px; letter-spacing: -.01em; white-space: nowrap; }
-.brand small { display: inline; font-size: 12.5px; letter-spacing: 0; font-weight: 500; color: var(--gray-3); margin-left: 10px; }
+.brand small { display: inline; font-size: 12.5px; letter-spacing: 0; font-weight: 500; color: var(--gray-3); }
 nav.views { margin-left: auto; display: flex; }
 nav.views button { border: 0; border-left: 1px solid var(--black); background: none; padding: 0 22px; color: var(--black); position: relative; }
 nav.views button:hover { background: var(--gray-1); }
