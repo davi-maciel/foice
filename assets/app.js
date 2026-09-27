@@ -154,7 +154,7 @@
     return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
       <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}</div>
       <h3 class="title">${title}</h3>
-      <div class="meta"><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year} · p.&nbsp;${p.page}${src}</div>
+      <div class="meta"><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year}${src}</div>
       <p class="snippet">${highlight(snippet(p, toks), toks)}</p>
       <div class="foot">
         <a class="open" href="${pdfHref(p)}" target="_blank" rel="noopener" title="Abrir o PDF na página ${p.page}">Abrir PDF <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
@@ -244,7 +244,7 @@
     els.groups.innerHTML = groups.map((g) => `<article class="grp${state.group === g.id ? " focus" : ""}" id="grp-${esc(g.id)}">
       <header><h3>${esc(g.title)}</h3><span class="gmeta">${esc(topicLabel[g.topic])} · ${g.members.length} versões · ${g.years.join(", ")}</span></header>
       <div class="lists">${g.members.map((m) => `<div class="lrow${isSolved(m.id) ? " solved" : ""}" data-id="${m.id}"><button class="lmain" data-open="${m.id}" title="Abrir este problema">
-        <span class="lname">${esc(m.displayTitle)}</span><span class="lmeta">${esc(m.authorName)} · ${esc(m.L.label)} · ${m.year}${m.title ? ` · problema ${esc(m.label)}` : ""} · p. ${m.page}</span></button>
+        <span class="lname">${esc(m.displayTitle)}</span><span class="lmeta">${esc(m.authorName)} · ${esc(m.L.label)} · ${m.year}${m.title ? ` · problema ${esc(m.label)}` : ""}</span></button>
         <a class="lpdf" href="${pdfHref(m)}" target="_blank" rel="noopener" title="Abrir o PDF na página ${m.page}">PDF ↗</a></div>`).join("")}</div></article>`).join("");
     if (state.group) { const el = $(`#grp-${state.group}`); if (el) requestAnimationFrame(() => el.scrollIntoView({ block: "start", behavior: "smooth" })); }
   }
@@ -266,11 +266,11 @@
     $$(`[data-id="${id}"]`).forEach((el) => el.classList.add("active"));
     const i = current.findIndex((x) => x.id === id);
     $("h2", els.panel).textContent = p.displayTitle;
-    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}página ${p.page} de ${p.L.pages} · <span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.source ? ` · fonte: ${esc(p.source)}` : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
+    $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}<span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.source ? ` · fonte: ${esc(p.source)}` : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
     $("#openPdf", els.panel).href = pdfHref(p);
-    $("#openPdf", els.panel).lastElementChild.textContent = ` Abrir PDF na p. ${p.page}`;
+    $("#openPdf", els.panel).lastElementChild.textContent = " Abrir PDF";
     const gab = $("#openGab", els.panel);
-    if (p.L.gabaritoPage) { gab.hidden = false; gab.href = pdfHref(p, p.L.gabaritoPage); gab.lastElementChild.textContent = ` Gabarito (p. ${p.L.gabaritoPage})`; } else gab.hidden = true;
+    if (p.L.gabaritoPage) { gab.hidden = false; gab.href = pdfHref(p, p.L.gabaritoPage); gab.lastElementChild.textContent = " Gabarito"; } else gab.hidden = true;
     $("#prevBtn", els.panel).disabled = i <= 0; $("#nextBtn", els.panel).disabled = i === -1 || i >= current.length - 1;
     $("#posInfo", els.panel).textContent = i === -1 ? "" : `${i + 1} / ${current.length}`;
     renderPanelSolved();
