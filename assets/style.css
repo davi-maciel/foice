@@ -221,6 +221,7 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .panel .actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; gap: 1px; background: var(--black); border-bottom: 1px solid var(--black); }
 .panel .actions > * { min-width: 0; border: 0 !important; margin: 0; padding: 11px 8px; font-size: 12.5px; justify-content: center; background: var(--white); }
 .panel .actions > .btn.primary { background: var(--black); }
+.panel .actions .solve, .panel .actions #posInfo { color: var(--black); }
 .panel .actions .btn { grid-column: span 3; }
 .panel.no-gab .actions .btn.primary { grid-column: span 6; border-right: 0; }
 .panel .actions #openGab { border-right: 0; }
