@@ -143,8 +143,9 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .card.solved .title { color: var(--gray-3); text-decoration: line-through; }
 .card .tags { display: flex; align-items: center; gap: 12px; color: var(--gray-3); padding-right: 64px; }
 .card .stars { color: var(--black); letter-spacing: .05em; }
-.versions { border: 1px solid var(--black); background: none; padding: 1px 6px; color: var(--black); cursor: pointer; font-family: inherit; }
-.versions:hover { background: var(--black); color: var(--white); }
+.versions { border: 0; background: none; padding: 0; margin: 0; color: inherit; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.versions::before { content: "· "; }
+.versions:hover { color: var(--black); text-decoration: underline; text-underline-offset: 3px; }
 .card .title { margin: 6px 0 0; font-size: 24px; line-height: 1.05; font-weight: 700; letter-spacing: -.03em; padding-right: 40px; }
 .card .title .num { font-weight: 400; color: var(--gray-3); }
 .card .meta { color: var(--gray-3); display: flex; flex-wrap: wrap; gap: 4px 6px; text-transform: none; letter-spacing: 0; font-size: 12.5px; }
@@ -272,5 +273,5 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .panel .actions #panelRandom { grid-column: span 6; border-right: 0; order: 3; }
 }
 @media (min-width: 1100px) { body.panel-open .grid { grid-template-columns: 1fr; } body.panel-open .card { min-height: 0; } body.panel-open .resultbar .count b { font-size: 40px; } }
-.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+.panel .pmeta .versions { margin-left: 0; }
 .panel .pmeta .stars { letter-spacing: .08em; }
