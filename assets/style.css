@@ -262,6 +262,7 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .searchbar .btn { width: 100%; justify-content: center; padding: 14px; border-top: 1px solid var(--black); }
   .chip { padding: 10px 12px; }
   .subfilters .select, .subfilters .toggle { border-right: 0; border-bottom: 1px solid var(--gray-2); width: 100%; }
+  .subfilters .select select { width: 100%; }   /* o select ocupa a linha toda, então a seta também abre o menu */
   .reset { padding: 10px 16px; }
   .grid { grid-template-columns: 1fr; }
   .card { min-height: 0; }
