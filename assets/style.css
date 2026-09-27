@@ -95,6 +95,7 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .search svg { color: var(--black); flex: none; }
 .search input { flex: 1; border: 0; background: transparent; font: 400 clamp(18px, 2vw, 24px)/1 var(--sans); padding: 18px 0; color: var(--black); min-width: 0; letter-spacing: -.01em; }
 .search input::placeholder { color: var(--gray-3); }
+.search input::-webkit-search-cancel-button, .search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }  /* o X nativo do type=search */
 .search input:focus { outline: none; }
 .search kbd { font: 500 11px/1 var(--sans); color: var(--gray-3); border: 1px solid var(--gray-2); padding: 4px 6px; }
 .search .clear { display: none; border: 0; background: none; color: var(--gray-3); padding: 4px; }
