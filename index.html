@@ -51,15 +51,9 @@
       <div class="chips" id="chips" role="group" aria-label="Filtrar por tema"></div>
 
       <div class="subfilters">
-        <span class="select"><select id="fYear" aria-label="Ano"></select></span>
-        <span class="select"><select id="fAuthor" aria-label="Autor"></select></span>
-        <span class="select"><select id="fDiff" aria-label="Dificuldade">
-          <option value="">Qualquer dificuldade</option>
-          <option value="any">Só com dificuldade indicada</option>
-          <option value="1">★ fácil</option>
-          <option value="2">★★ médio</option>
-          <option value="3">★★★ difícil</option>
-        </select></span>
+        <details class="msel" id="fYear"><summary aria-label="Ano"></summary><div class="menu"></div></details>
+        <details class="msel" id="fAuthor"><summary aria-label="Autor"></summary><div class="menu"></div></details>
+        <details class="msel" id="fDiff"><summary aria-label="Dificuldade"></summary><div class="menu"></div></details>
         <span class="select"><select id="fSort" aria-label="Ordenar">
           <option value="recentes">Mais recentes primeiro</option>
           <option value="antigos">Mais antigos primeiro</option>

@@ -124,6 +124,18 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .select select { appearance: none; border: 0; background: transparent; color: var(--black); padding: 12px 36px 12px 16px; font: 500 11px var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .select::after { content: ""; position: absolute; right: 16px; top: 50%; width: 6px; height: 6px; border-right: 1px solid var(--black); border-bottom: 1px solid var(--black); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
 .select select.active { color: var(--red); }
+.msel { position: relative; border-right: 1px solid var(--gray-2); }
+.msel summary { list-style: none; cursor: pointer; padding: 12px 36px 12px 16px; font: 500 11px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--black); white-space: nowrap; position: relative; }
+.msel summary::-webkit-details-marker { display: none; }
+.msel summary::after { content: ""; position: absolute; right: 16px; top: 50%; width: 6px; height: 6px; border-right: 1px solid var(--black); border-bottom: 1px solid var(--black); transform: translateY(-70%) rotate(45deg); }
+.msel[open] summary::after { transform: translateY(-30%) rotate(-135deg); }
+.msel.active summary { color: var(--red); }
+.msel .menu { position: absolute; left: -1px; top: 100%; z-index: 20; min-width: calc(100% + 2px); max-height: 320px; overflow: auto; background: var(--white); border: 1px solid var(--black); display: flex; flex-direction: column; }
+.mopt { display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 13px; letter-spacing: 0; text-transform: none; white-space: nowrap; cursor: pointer; border-bottom: 1px solid var(--gray-1); }
+.mopt:hover { background: var(--gray-1); }
+.mopt input { accent-color: var(--red); width: 14px; height: 14px; margin: 0; flex: none; }
+.mopt b { margin-left: auto; padding-left: 12px; font-weight: 400; color: var(--gray-3); font-variant-numeric: tabular-nums; }
+.mclear { border: 0; border-bottom: 1px solid var(--gray-2); background: none; text-align: left; padding: 9px 14px; color: var(--red); cursor: pointer; font: 500 11px var(--sans); letter-spacing: .1em; text-transform: uppercase; }
 .toggle { display: inline-flex; align-items: center; gap: 10px; padding: 0 16px; color: var(--black); cursor: pointer; user-select: none; border-right: 1px solid var(--gray-2); }
 .toggle input { accent-color: var(--red); width: 14px; height: 14px; }
 .toggle .x { border: 0; background: none; color: var(--red); padding: 0 4px; }
@@ -261,7 +273,8 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .search kbd { display: none; }
   .searchbar .btn { width: 100%; justify-content: center; padding: 14px; border-top: 1px solid var(--black); }
   .chip { padding: 10px 12px; }
-  .subfilters .select, .subfilters .toggle { border-right: 0; border-bottom: 1px solid var(--gray-2); width: 100%; }
+  .subfilters .select, .subfilters .toggle, .subfilters .msel { border-right: 0; border-bottom: 1px solid var(--gray-2); width: 100%; }
+  .msel .menu { position: static; border: 0; border-top: 1px solid var(--gray-2); max-height: 50vh; }
   .subfilters .select select { width: 100%; }   /* o select ocupa a linha toda, então a seta também abre o menu */
   .reset { padding: 10px 16px; }
   .grid { grid-template-columns: 1fr; }

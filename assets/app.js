@@ -95,15 +95,16 @@
     if (toks.length > 1 && p.hay.includes(toks.join(" "))) s += 4;
     return s;
   }
+  // filtros com várias escolhas: guardados como "a,b,c" (também assim na URL)
+  const sel = (k) => new Set(String(state[k] || "").split(",").filter(Boolean));
+  const setSel = (k, set) => { state[k] = [...set].join(","); };
+  const diffKey = (p) => String(Math.min(p.stars || 0, 3));   // 0 = sem indicação, 3 = três ou mais
   function baseFilter(p, { skipTopic = false } = {}) {
-    if (!skipTopic && state.topic && p.topic !== state.topic) return false;
-    if (state.year && String(p.year) !== state.year) return false;
-    if (state.author && p.authorId !== state.author) return false;
+    if (!skipTopic && state.topic && !sel("topic").has(p.topic)) return false;
+    if (state.year && !sel("year").has(String(p.year))) return false;
+    if (state.author && !sel("author").has(p.authorId)) return false;
     if (state.list && p.list !== state.list) return false;
-    if (state.diff) {
-      if (state.diff === "any" && !p.stars) return false;
-      if (state.diff !== "any" && (p.stars || 0) !== Number(state.diff) && !(state.diff === "3" && (p.stars || 0) >= 3)) return false;
-    }
+    if (state.diff && !sel("diff").has(diffKey(p))) return false;
     if (state.hideSolved && isSolved(p.id)) return false;
     return true;
   }
@@ -179,15 +180,17 @@
     const counts = {}; let total = 0;
     const toks = tokens();
     for (const p of D.problems) if (baseFilter(p, { skipTopic: true }) && (!toks.length || matches(p, toks))) { counts[p.topic] = (counts[p.topic] || 0) + 1; total++; }
-    els.chips.innerHTML = `<button class="chip all" aria-pressed="${!state.topic}" data-topic="">Todos <b>${total}</b></button>` +
-      topics.map((t) => `<button class="chip" aria-pressed="${state.topic === t.id}" data-topic="${t.id}">${esc(t.label)} <b>${counts[t.id] || 0}</b></button>`).join("");
+    const ts = sel("topic");
+    els.chips.innerHTML = `<button class="chip all" aria-pressed="${!ts.size}" data-topic="">Todos <b>${total}</b></button>` +
+      topics.map((t) => `<button class="chip" aria-pressed="${ts.has(t.id)}" data-topic="${t.id}">${esc(t.label)} <b>${counts[t.id] || 0}</b></button>`).join("");
   }
   function renderSubfilters() {
-    els.year.innerHTML = `<option value="">Todos os anos</option>` + years.map((y) => `<option value="${y}" ${String(y) === state.year ? "selected" : ""}>${y}</option>`).join("");
-    els.author.innerHTML = `<option value="">Todos os autores</option>` + authorsSorted.map((a) => `<option value="${a.id}" ${a.id === state.author ? "selected" : ""}>${esc(a.name)} (${a.n})</option>`).join("");
-    els.diff.value = state.diff; els.sort.value = state.sort;
+    renderMsel(els.year, "year", years.map((y) => ({ v: String(y), label: String(y) })), "Todos os anos", (n) => `${n} anos`);
+    renderMsel(els.author, "author", authorsSorted.map((a) => ({ v: a.id, label: a.name, n: a.n })), "Todos os autores", (n) => `${n} autores`);
+    renderMsel(els.diff, "diff", [{ v: "1", label: "★ fácil" }, { v: "2", label: "★★ médio" }, { v: "3", label: "★★★ difícil" }, { v: "0", label: "sem indicação" }], "Qualquer dificuldade", (n) => `${n} dificuldades`);
+    els.sort.value = state.sort;
     els.hide.checked = state.hideSolved;
-    [els.year, els.author, els.diff].forEach((s) => s.classList.toggle("active", !!s.value));
+
     els.sort.classList.toggle("active", state.sort !== "recentes");
     const relevOpt = $('option[value="relevancia"]', els.sort); relevOpt.hidden = !state.q;
     if (state.q && state.sort === "recentes") els.sort.value = "relevancia";
@@ -195,6 +198,16 @@
     els.reset.hidden = !any;
     els.listTag.hidden = !state.list;
     if (state.list && lists[state.list]) els.listTag.innerHTML = `Lista: <b>${esc(lists[state.list].authorName)} — ${esc(lists[state.list].label)} (${lists[state.list].year})</b> <button class="x" title="remover filtro">✕</button>`;
+  }
+  function renderMsel(el, key, opts, allLabel, manyLabel) {
+    const chosen = sel(key);
+    const one = opts.find((o) => chosen.has(o.v));
+    $("summary", el).textContent = !chosen.size ? allLabel : chosen.size === 1 && one ? one.label : manyLabel(chosen.size);
+    el.classList.toggle("active", chosen.size > 0);
+    const menu = $(".menu", el);
+    const html = (chosen.size ? `<button type="button" class="mclear" data-key="${key}">limpar</button>` : "") +
+      opts.map((o) => `<label class="mopt"><input type="checkbox" data-key="${key}" value="${esc(o.v)}" ${chosen.has(o.v) ? "checked" : ""}> <span>${esc(o.label)}</span>${o.n ? ` <b>${o.n}</b>` : ""}</label>`).join("");
+    if (menu.dataset.html !== html) { const st = menu.scrollTop; menu.innerHTML = html; menu.dataset.html = html; menu.scrollTop = st; }
   }
   function renderGrid() {
     const toks = tokens();
@@ -347,10 +360,23 @@
 
     let qt; els.q.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { state.q = els.q.value.trim(); state.shown = 72; $(".search").classList.toggle("has-q", !!state.q); render(); }, 120); });
     $(".search .clear").addEventListener("click", () => { els.q.value = ""; state.q = ""; $(".search").classList.remove("has-q"); render(); els.q.focus(); });
-    els.chips.addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; state.topic = b.dataset.topic === state.topic ? "" : b.dataset.topic; state.shown = 72; render(); });
-    els.year.addEventListener("change", () => { state.year = els.year.value; state.shown = 72; render(); });
-    els.author.addEventListener("change", () => { state.author = els.author.value; state.list = ""; state.shown = 72; render(); });
-    els.diff.addEventListener("change", () => { state.diff = els.diff.value; state.shown = 72; render(); });
+    els.chips.addEventListener("click", (e) => {
+      const b = e.target.closest(".chip"); if (!b) return;
+      const t = b.dataset.topic, ts = sel("topic");
+      if (!t) ts.clear(); else if (ts.has(t)) ts.delete(t); else ts.add(t);
+      setSel("topic", ts); state.shown = 72; render();
+    });
+    [els.year, els.author, els.diff].forEach((el) => {
+      el.addEventListener("change", (e) => {
+        const cb = e.target.closest("input[type=checkbox]"); if (!cb) return;
+        const k = cb.dataset.key, set = sel(k);
+        if (cb.checked) set.add(cb.value); else set.delete(cb.value);
+        setSel(k, set); if (k === "author") state.list = ""; state.shown = 72; render();
+      });
+      el.addEventListener("click", (e) => { const c = e.target.closest(".mclear"); if (c) { e.preventDefault(); state[c.dataset.key] = ""; state.shown = 72; render(); } });
+      el.addEventListener("toggle", () => { if (el.open) [els.year, els.author, els.diff].forEach((o) => { if (o !== el) o.open = false; }); });
+    });
+    document.addEventListener("click", (e) => { if (!e.target.closest(".msel")) [els.year, els.author, els.diff].forEach((o) => { o.open = false; }); });
     els.sort.addEventListener("change", () => { state.sort = els.sort.value; if (state.sort === "aleatorio") seed = Date.now() % 100000; render(); });
     els.hide.addEventListener("change", () => { state.hideSolved = els.hide.checked; render(); });
     const resetAll = () => { Object.assign(state, { q: "", topic: "", year: "", author: "", list: "", diff: "", sort: "recentes", hideSolved: false, shown: 72 }); els.q.value = ""; $(".search").classList.remove("has-q"); render(); };
@@ -378,6 +404,7 @@
     $("#panelRandom").addEventListener("click", random);
     document.addEventListener("keydown", (e) => {
       const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName);
+      if (e.key === "Escape" && [els.year, els.author, els.diff].some((o) => o.open)) { [els.year, els.author, els.diff].forEach((o) => { o.open = false; }); return; }
       if (e.key === "Escape") { if (state.open) closeDetail(); else if (typing) document.activeElement.blur(); return; }
       if (typing) return;
       if (e.key === "/") { e.preventDefault(); els.q.focus(); els.q.select(); }
