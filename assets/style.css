@@ -273,6 +273,12 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .search kbd { display: none; }
   .searchbar .btn { width: 100%; justify-content: center; padding: 14px; border-top: 1px solid var(--black); }
   .chip { padding: 10px 12px; }
+  /* temas: grade de duas colunas iguais, nome à esquerda e contagem alinhada à direita */
+  .chips { display: grid; grid-template-columns: 1fr 1fr; }
+  .chip { display: flex; justify-content: space-between; align-items: baseline; text-align: left; padding: 12px 14px; border-right: 1px solid var(--gray-2); border-bottom: 1px solid var(--gray-2); }
+  .chip:nth-child(2n) { border-right: 0; }
+  .chip:last-child { border-bottom: 0; }
+  .chip:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
   .subfilters .select, .subfilters .toggle, .subfilters .msel { border-right: 0; border-bottom: 1px solid var(--gray-2); width: 100%; }
   .msel .menu { position: static; border: 0; border-top: 1px solid var(--gray-2); max-height: 50vh; }
   .subfilters .select select { width: 100%; }   /* o select ocupa a linha toda, então a seta também abre o menu */
