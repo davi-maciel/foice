@@ -262,7 +262,7 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .top .wrap { flex-wrap: wrap; min-height: 0; }
   .brand { padding: 12px 0; border-right: 0; flex: 1; }
   .brand small { display: none; }
-  nav.views { margin-left: 0; width: 100%; border-top: 1px solid var(--black); }
+  nav.views { margin: 0 -18px; width: calc(100% + 36px); border-top: 1px solid var(--black); }   /* filete de ponta a ponta, como o de baixo */
   nav.views button { flex: 1; padding: 12px 0; border-left: 0; border-right: 1px solid var(--black); }
   nav.views button:last-child { border-right: 0; }
   .gh { display: none; }
