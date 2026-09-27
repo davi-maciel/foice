@@ -25,12 +25,15 @@ img { max-width: 100%; }
 body.panel-open { overflow: hidden; }
 @media (min-width: 1100px) {
   body.panel-open { overflow: auto; }
+  /* a barra de rolagem da página passaria por cima do painel fixo: com o painel aberto ela some (a lista continua rolando) */
+  html:has(body.panel-open) { scrollbar-width: none; }
+  html:has(body.panel-open)::-webkit-scrollbar { display: none; }
   body.panel-open .scrim { display: none; }
   body.panel-open .wrap { max-width: none; padding-right: calc(var(--panel-w) + 20px); }
   body.panel-open .top .wrap { flex-wrap: wrap; }
 }
 @media (max-width: 1099px) {
-  .panel { width: min(100vw, 720px); overflow-x: hidden; }
+  .panel { width: min(100vw, 720px); overflow-x: clip; }
   .panel .pbody { overflow-x: hidden; }
   .panel .viewer { display: none; }
   .panel.has-crop .viewer { display: block; }
