@@ -263,6 +263,11 @@
     const prev = state.open; state.open = id; writeHash();
     if (prev) $$(`[data-id="${prev}"]`).forEach((el) => el.classList.remove("active"));
     $$(`[data-id="${id}"]`).forEach((el) => el.classList.add("active"));
+    // ao navegar com o teclado, o foco (e seu contorno vermelho) acompanha o cartão aberto
+    const ae = document.activeElement;
+    if (ae && ae.classList && ae.classList.contains("card") && ae.dataset.id !== id) {
+      const nc = $(`.card[data-id="${id}"]`); if (nc) nc.focus({ preventScroll: true });
+    }
     const i = current.findIndex((x) => x.id === id);
     $("h2", els.panel).textContent = p.displayTitle;
     $(".pmeta", els.panel).innerHTML = `<b>${esc(p.authorName)}</b> · ${esc(p.L.label)} · ${p.year} · ${p.title ? `problema ${esc(p.label)} · ` : ""}<span class="ptopic">${esc(topicLabel[p.topic])}</span>${p.stars ? " " + starsHtml(p) : ""}${p.versions > 1 ? " " + versionsHtml(p) : ""}`;
