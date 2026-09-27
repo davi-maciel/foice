@@ -275,6 +275,7 @@
     $("#openPdf", els.panel).lastElementChild.textContent = " Abrir PDF";
     const gab = $("#openGab", els.panel);
     if (p.L.gabaritoPage) { gab.hidden = false; gab.href = pdfHref(p, p.L.gabaritoPage); gab.lastElementChild.textContent = " Gabarito"; } else gab.hidden = true;
+    els.panel.classList.toggle("no-gab", !p.L.gabaritoPage);
     $("#prevBtn", els.panel).disabled = i <= 0; $("#nextBtn", els.panel).disabled = i === -1 || i >= current.length - 1;
     $("#posInfo", els.panel).textContent = i === -1 ? "" : `${i + 1} / ${current.length}`;
     renderPanelSolved();
