@@ -58,10 +58,7 @@ def line_text(line):
     # drop a space that pdfminer inserted right after a skipped accent glyph (e.g. "inscrit ível")
     return text.replace("\n", "").rstrip()
 
-def page_lines(layout, gutter=18):
-    """Lines of a page in reading order. Fragments that sit on the same row and close to each
-    other (e.g. a LaTeX section number and its title) are merged into one line; two-column
-    pages are read left column first."""
+def _raw_rows(layout):
     raw = []
     for box in layout:
         if not isinstance(box, LTTextBox): continue
@@ -72,28 +69,46 @@ def page_lines(layout, gutter=18):
                 sizes = sorted(c.size for c in ln if isinstance(c, LTChar))
                 size = sizes[len(sizes) // 2] if sizes else 10
                 raw.append({"x0": ln.x0, "x1": ln.x1, "y0": ln.y0, "y1": ln.y1, "size": size, "parts": [(ln.x0, t)]})
-    if not raw: return []
+    return raw
+
+def _kind_fn(layout, gutter):
     mid = (layout.x0 + layout.x1) / 2
     def kind(r):
         if r["x0"] < mid - gutter and r["x1"] > mid + gutter: return "full"
         return "left" if (r["x0"] + r["x1"]) / 2 < mid else "right"
-    kinds = [kind(r) for r in raw]
-    # duas colunas de verdade: várias linhas à esquerda e várias à direita cujo início (x0) coincide;
-    # equações centradas e fins de parágrafo curtos não se alinham assim.
+    return kind, mid
+
+def detect_two_col(layout, gutter=18, raw=None):
+    """(two_col, determined). Duas colunas quando há linhas de texto largas dos dois lados, alinhadas e lado a
+    lado, ou uma coluna esquerda justificada com algo à direita. `determined` é False quando a página só tem
+    fragmentos curtos (fim de problema + gabarito em fórmulas) e não dá para decidir por ela mesma."""
     from collections import Counter
+    raw = _raw_rows(layout) if raw is None else raw
+    kind, mid = _kind_fn(layout, gutter)
+    kinds = [kind(r) for r in raw]
     wide = 0.3 * (layout.x1 - layout.x0)          # linha de texto de verdade, não fragmento de fórmula
-    right_starts = Counter(round(r["x0"] / 3) for r, k in zip(raw, kinds) if k == "right" and r["x0"] > mid - gutter)
-    # e as duas colunas precisam coexistir lado a lado: linhas à esquerda com uma linha à direita na mesma altura
-    rights = [r for r, k in zip(raw, kinds) if k == "right"]
-    side_by_side = sum(1 for r, k in zip(raw, kinds) if k == "left" and any(min(r["y1"], q["y1"]) - max(r["y0"], q["y0"]) > 2 for q in rights))
-    two_col = kinds.count("left") >= 3 and bool(right_starts) and max(right_starts.values()) >= 3 and side_by_side >= 3
-    # coluna esquerda justificada (muitas linhas terminando no mesmo x antes da calha) com algo à direita:
-    # também é página de duas colunas, mesmo com a coluna direita quase vazia (ex.: só o gabarito)
-    edges = Counter(round(r["x1"]) for r, k in zip(raw, kinds) if k == "left" and r["x1"] < mid + gutter and r["x1"] - r["x0"] >= wide)
+    wide_left = [r for r, k in zip(raw, kinds) if k == "left" and r["x1"] - r["x0"] >= wide]
+    wide_right = [r for r, k in zip(raw, kinds) if k == "right" and r["x1"] - r["x0"] >= wide]
+    right_starts = Counter(round(r["x0"] / 3) for r in wide_right if r["x0"] > mid - gutter)
+    side_by_side = sum(1 for r in wide_left if any(min(r["y1"], q["y1"]) - max(r["y0"], q["y0"]) > 2 for q in wide_right))
+    two_col = len(wide_left) >= 3 and bool(right_starts) and max(right_starts.values()) >= 3 and side_by_side >= 3
+    edges = Counter(round(r["x1"]) for r in wide_left if r["x1"] < mid + gutter)
     if edges and not two_col:
         edge, n_edge = edges.most_common(1)[0]
         n_right = sum(1 for r, k in zip(raw, kinds) if k == "right" and r["x0"] > edge + 4)
         if n_edge >= 5 and n_right >= 2: two_col = True
+    n_full = sum(1 for k in kinds if k == "full")
+    determined = two_col or (len(wide_left) + len(wide_right) + n_full) >= 6   # com pouco texto, herda a vizinha
+    return two_col, determined
+
+def page_lines(layout, gutter=18, two_col=None):
+    """Lines of a page in reading order. Fragments that sit on the same row and close to each
+    other (e.g. a LaTeX section number and its title) are merged into one line; two-column
+    pages are read left column first. `two_col` força a decisão (páginas ambíguas herdam a vizinha)."""
+    raw = _raw_rows(layout)
+    if not raw: return []
+    kind, mid = _kind_fn(layout, gutter)
+    if two_col is None: two_col, _ = detect_two_col(layout, gutter, raw)
     # --- merge same-row fragments
     raw.sort(key=lambda r: -(r["y0"] + r["y1"]) / 2)
     rows = []
@@ -135,10 +150,18 @@ def page_lines(layout, gutter=18):
     return out
 
 def extract_rows(pdf):
-    """Per page: {"w", "h", "rows": [{"text", "x0", "x1", "y0", "y1", "kind"}]} in reading order (PDF points, y up)."""
+    """Per page: {"w", "h", "rows": [{"text", "x0", "x1", "y0", "y1", "kind", "size"}]} in reading order (PDF points, y up)."""
+    layouts = list(extract_pages(pdf, laparams=LAParams(line_margin=0.3, char_margin=2.0, boxes_flow=0.5)))
+    verdicts = [detect_two_col(l) for l in layouts]
+    final = []
+    for i, (tc, det) in enumerate(verdicts):
+        if det: final.append(tc); continue
+        prev = next((verdicts[j][0] for j in range(i - 1, -1, -1) if verdicts[j][1]), None)
+        nxt = next((verdicts[j][0] for j in range(i + 1, len(verdicts)) if verdicts[j][1]), None)
+        final.append(prev if prev is not None else (nxt if nxt is not None else tc))
     pages = []
-    for layout in extract_pages(pdf, laparams=LAParams(line_margin=0.3, char_margin=2.0, boxes_flow=0.5)):
-        rows = page_lines(layout)
+    for layout, tc in zip(layouts, final):
+        rows = page_lines(layout, two_col=tc)
         pages.append({"w": layout.width, "h": layout.height,
                       "rows": [{k: r[k] for k in ("text", "x0", "x1", "y0", "y1", "kind", "size")} for r in rows]})
     return pages
