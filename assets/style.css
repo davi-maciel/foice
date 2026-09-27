@@ -196,7 +196,7 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .panel header { display: flex; align-items: flex-start; gap: 0; padding: 0 0 0 22px; border-bottom: 1px solid var(--black); }
 .panel header .grow { flex: 1; min-width: 0; padding: 18px 16px 14px 0; }
 .panel h2 { margin: 0 0 6px; font-size: 32px; line-height: 1; letter-spacing: -.035em; font-weight: 700; }
-.panel .pmeta { color: var(--gray-3); }
+.panel .pmeta { color: var(--gray-3); text-transform: none; letter-spacing: 0; font-size: 13px; }
 .panel .pmeta b { color: var(--black); }
 .iconbtn { border: 0; border-left: 1px solid var(--black); background: var(--white); width: 56px; align-self: stretch; display: inline-grid; place-items: center; color: var(--black); flex: none; }
 .iconbtn:hover { background: var(--gray-1); }
@@ -267,5 +267,5 @@ kbd.k { font: 500 10px var(--sans); border: 1px solid #555; padding: 2px 5px; co
   .panel .actions #panelRandom { grid-column: span 6; border-right: 0; order: 3; }
 }
 @media (min-width: 1100px) { body.panel-open .grid { grid-template-columns: 1fr; } body.panel-open .card { min-height: 0; } body.panel-open .resultbar .count b { font-size: 40px; } }
-.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; }
+.panel .pmeta .versions { margin-left: 4px; vertical-align: middle; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
 .panel .pmeta .stars { letter-spacing: .08em; }
