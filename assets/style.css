@@ -147,7 +147,7 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .versions:hover { background: var(--black); color: var(--white); }
 .card .title { margin: 6px 0 0; font-size: 24px; line-height: 1.05; font-weight: 700; letter-spacing: -.03em; padding-right: 40px; }
 .card .title .num { font-weight: 400; color: var(--gray-3); }
-.card .meta { color: var(--gray-3); display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.card .meta { color: var(--gray-3); display: flex; flex-wrap: wrap; gap: 4px 6px; text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .card .meta b { color: var(--black); font-weight: 500; }
 .card .snippet { margin: 0; color: var(--black); font-size: 14px; line-height: 1.45; }
 .card .foot { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 10px; border-top: 1px solid var(--gray-2); }
