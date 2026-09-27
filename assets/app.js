@@ -152,9 +152,9 @@
     const title = p.title ? highlight(p.title, toks) : `<span class="num">Problema ${esc(p.label)}</span>`;
     const probNo = p.title ? ` · ${esc(labelText(p))}` : "";
     return `<article class="card${isSolved(p.id) ? " solved" : ""}${state.open === p.id ? " active" : ""}" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.displayTitle)}">
-      <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${versionsHtml(p)}${starsHtml(p)}</div>
+      <div class="tags"><span>${esc(topicLabel[p.topic])}</span>${starsHtml(p)}</div>
       <h3 class="title">${title}</h3>
-      <div class="meta"><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year}</div>
+      <div class="meta"><span><b>${esc(p.authorName)}</b> · ${esc(p.L.label)}${probNo} · ${p.year} ${versionsHtml(p)}</span></div>
       <p class="snippet">${highlight(snippet(p, toks), toks)}</p>
       <div class="foot">
         <a class="open" href="${pdfHref(p)}" target="_blank" rel="noopener" title="Abrir o PDF na página ${p.page}">Abrir PDF <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
