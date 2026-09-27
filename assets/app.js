@@ -385,6 +385,10 @@
       else if (state.open && (e.key === "ArrowRight" || e.key === "j")) nav(1);
       else if (state.open && (e.key === "ArrowLeft" || e.key === "k")) nav(-1);
     });
+    const toTop = $("#toTop");
+    const onScroll = () => { toTop.hidden = window.scrollY < 600; };
+    window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+    toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
     window.addEventListener("hashchange", () => { const before = JSON.stringify(state); readHash(); if (JSON.stringify(state) !== before) { els.q.value = state.q; render(); if (state.open) openDetail(state.open); else closeDetail(); } });
   }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();

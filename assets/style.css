@@ -224,6 +224,11 @@ nav.views button[aria-pressed="true"]::after { content: ""; position: absolute; 
 .panel.has-crop .viewer { background: var(--white); height: auto; }
 .panel .viewer iframe { height: 100%; }
 .panel .cropimg { display: block; width: 100%; max-width: 100%; height: auto; margin: 0 auto; padding: 22px 22px 48px; box-sizing: border-box; }
+/* voltar ao topo */
+.totop { position: fixed; left: 20px; bottom: 20px; width: 44px; height: 44px; border: 1px solid var(--black); background: var(--white); color: var(--black); display: grid; place-items: center; cursor: pointer; z-index: 25; padding: 0; }
+.totop:hover { background: var(--black); color: var(--white); }
+@media (max-width: 640px) { .totop { left: 16px; bottom: 16px; } }
+
 /* rodapé em faixa preta */
 footer { background: var(--black); color: #bdbdbd; padding: 34px 0 60px; font-size: 13px; }
 footer .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; }
